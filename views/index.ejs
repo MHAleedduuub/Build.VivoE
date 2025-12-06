@@ -1,0 +1,64 @@
+<%- include('layouts/main') -%>
+
+<div class="text-center py-12">
+    <h1 class="text-4xl font-bold text-gray-800 mb-4">
+        🚀 أنشئ موقعك بالذكاء الاصطناعي في دقائق
+    </h1>
+    <p class="text-xl text-gray-600 mb-8">
+        لا تحتاج إلى خبرة في البرمجة، فقط صف ما تريد وسننشئه لك
+    </p>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <div class="bg-white p-6 rounded-xl shadow-lg">
+            <div class="text-blue-500 text-4xl mb-4">
+                <i class="fas fa-robot"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-2">الذكاء الاصطناعي</h3>
+            <p class="text-gray-600">أنشئ موقعاً كاملاً بواسطة Gemini AI</p>
+        </div>
+        
+        <div class="bg-white p-6 rounded-xl shadow-lg">
+            <div class="text-green-500 text-4xl mb-4">
+                <i class="fas fa-mouse-pointer"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-2">السحب والإفلات</h3>
+            <p class="text-gray-600">صمم موقعك بسهولة بواسطة واجهة مرئية</p>
+        </div>
+        
+        <div class="bg-white p-6 rounded-xl shadow-lg">
+            <div class="text-purple-500 text-4xl mb-4">
+                <i class="fas fa-rocket"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-2">النشر الفوري</h3>
+            <p class="text-gray-600">انشر موقعك على Vercel بنقرة واحدة</p>
+        </div>
+    </div>
+
+    <div class="space-x-4">
+        <a href="/ai/create" class="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:opacity-90">
+            <i class="fas fa-magic mr-2"></i> أنشئ بالذكاء الاصطناعي
+        </a>
+        <a href="/builder" class="bg-white text-blue-600 px-8 py-3 rounded-lg text-lg font-semibold border-2 border-blue-600 hover:bg-blue-50">
+            <i class="fas fa-paint-brush mr-2"></i> ابدأ البناء
+        </a>
+    </div>
+
+    <!-- حالة النظام -->
+    <div class="mt-12 p-6 bg-gray-100 rounded-xl max-w-2xl mx-auto">
+        <h3 class="text-lg font-bold mb-4">📊 حالة النظام</h3>
+        <div class="grid grid-cols-2 gap-4 text-right">
+            <div>
+                <span class="font-medium">قاعدة البيانات:</span>
+                <span class="<%= dbConnected ? 'text-green-600' : 'text-red-600' %>">
+                    <%= dbConnected ? '✅ متصلة' : '❌ غير متصلة' %>
+                </span>
+            </div>
+            <div>
+                <span class="font-medium">Gemini AI:</span>
+                <span class="<%= geminiAvailable ? 'text-green-600' : 'text-red-600' %>">
+                    <%= geminiAvailable ? '✅ متاح' : '❌ غير متاح' %>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
