@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .builder-container {
+            height: calc(100vh - 64px);
+        }
+        
+        .toolbox {
+            width: 300px;
+            background: #f8fafc;
+            border-left: 1px solid #e2e8f0;
+        }
+        
+        .preview-area {
+            flex: 1;
+            background: #ffffff;
+            overflow: auto;
+        }
+        
+        .component {
+            cursor: move;
+            transition: all 0.3s;
+        }
+        
+        .component:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .dragging {
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- شريط التنقل -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-4 rtl:space-x-reverse">
+                    <a href="/dashboard" class="text-xl font-bold text-blue-600">
+                        <i class="fas fa-globe"></i> منشئ المواقع
+                    </a>
+                    <div class="flex space-x-2 rtl:space-x-reverse">
+                        <button id="saveBtn" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                            <i class="fas fa-save"></i> حفظ
+                        </button>
+                        <button id="previewBtn" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+                            <i class="fas fa-eye"></i> معاينة
+                        </button>
+                        <button id="aiBtn" class="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600">
+                            <i class="fas fa-robot"></i> مساعد الذكاء
+                        </button>
+                        <button id="publishBtn" class="px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600">
+                            <i class="fas fa-rocket"></i> نشر على Vercel
+                        </button>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4 rtl:space-x-reverse">
+                    <span class="text-gray-700">مرحباً، <%= user.username %></span>
+                    <img src="<%= user.avatar || '/images/default-avatar.png' %>" 
+                         class="w-8 h-8 rounded-full" 
+                         alt="الصورة الشخصية">
+                    <a href="/auth/logout" class="text-red-500 hover:text-red-700">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- واجهة البناء -->
+    <div class="builder-container flex">
+        <!-- شريط الأدوات -->
+        <div class="toolbox p-4">
+            <h3 class="font-bold text-lg mb-4 text-gray-800">
+                <i class="fas fa-toolbox"></i> أدوات البناء
+            </h3>
+            
+            <!-- مكونات HTML -->
+            <div class="mb-6">
+                <h4 class="font-semibold mb-2 text-gray-700">
+                    <i class="fas fa-cubes"></i> المكونات
+                </h4>
+                <div class="space-y-2">
+                    <div class="component p-3 bg-white border rounded cursor-move" data-type="hero">
+                        <i class="fas fa-star text-blue-500"></i>
+                        <span class="mr-2">قسم البطل</span>
+                    </div>
+                    <div class="component p-3 bg-white border rounded cursor-move" data-type="features">
+                        <i class="fas fa-th-large text-green-500"></i>
+                        <span class="mr-2">قسم المميزات</span>
+                    </div>
+                    <div class="component p-3 bg-white border rounded cursor-move" data-type="testimonials">
+                        <i class="fas fa-comments text-yellow-500"></i>
+                        <span class="mr-2">آراء العملاء</span>
+                    </div>
+                    <div class="component p-3 bg-white border rounded cursor-move" data-type="contact">
+                        <i class="fas fa-envelope text-red-500"></i>
+                        <span class="mr-2">نموذج الاتصال</span>
+                    </div>
+                    <div class="component p-3 bg-white border rounded cursor-move" data-type="gallery">
+                        <i class="fas fa-images text-purple-500"></i>
+                        <span class="mr-2">معرض الصور</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- الذكاء الاصطناعي -->
+            <div class="mb-6">
+                <h4 class="font-semibold mb-2 text-gray-700">
+                    <i class="fas fa-robot"></i> مساعد الذكاء
+                </h4>
+                <div class="space-y-2">
+                    <button id="generateSiteBtn" class="w-full p-3 bg-purple-100 text-purple-700 rounded hover:bg-purple-200 text-right">
+                        <i class="fas fa-magic"></i> إنشاء موقع بالذكاء
+                    </button>
+                    <button id="optimizeContentBtn" class="w-full p-3 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 text-right">
+                        <i class="fas fa-wand-magic-sparkles"></i> تحسين المحتوى
+                    </button>
+                    <button id="generateSEOBtn" class="w-full p-3 bg-green-100 text-green-700 rounded hover:bg-green-200 text-right">
+                        <i class="fas fa-chart-line"></i> تحسين SEO
+                    </button>
+                </div>
+            </div>
+            
+            <!-- إعدادات -->
+            <div>
+                <h4 class="font-semibold mb-2 text-gray-700">
+                    <i class="fas fa-cog"></i> الإعدادات
+                </h4>
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1">اللون الأساسي</label>
+                        <input type="color" id="primaryColor" value="#3B82F6" class="w-full">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1">نوع الخط</label>
+                        <select id="fontFamily" class="w-full p-2 border rounded">
+                            <option value="'Segoe UI', sans-serif">Segoe UI</option>
+                            <option value="'Cairo', sans-serif">Cairo</option>
+                            <option value="'Tajawal', sans-serif">Tajawal</option>
+                            <option value="Arial, sans-serif">Arial</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1">نمط التصميم</label>
+                        <select id="designStyle" class="w-full p-2 border rounded">
+                            <option value="modern">حديث</option>
+                            <option value="minimal">بسيط</option>
+                            <option value="elegant">أنيق</option>
+                            <option value="corporate">شركات</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- منطقة المعاينة -->
+        <div class="preview-area p-4" id="previewArea">
+            <!-- هنا سيتم عرض الموقع -->
+            <div id="websiteContent" class="min-h-full">
+                <!-- المحتوى الافتراضي -->
+                <div class="text-center py-20 text-gray-500">
+                    <i class="fas fa-mouse-pointer text-4xl mb-4"></i>
+                    <h3 class="text-xl mb-2">اسحب المكونات هنا</h3>
+                    <p>ابدأ ببناء موقعك عن طريق سحب المكونات من الشريط الجانبي</p>
+                    <button id="startWithAI" class="mt-4 px-6 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600">
+                        <i class="fas fa-robot mr-2"></i> ابدأ مع الذكاء الاصطناعي
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- شريط الخصائص -->
+        <div class="toolbox p-4">
+            <h3 class="font-bold text-lg mb-4 text-gray-800">
+                <i class="fas fa-sliders-h"></i> الخصائص
+            </h3>
+            <div id="propertiesPanel">
+                <div class="text-center text-gray-500 py-10">
+                    <i class="fas fa-object-group text-3xl mb-3"></i>
+                    <p>اختر عنصراً لتعديل خصائصه</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة الذكاء الاصطناعي -->
+    <div id="aiModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50">
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl">
+            <div class="bg-white rounded-lg shadow-xl">
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold text-gray-800">
+                            <i class="fas fa-robot text-purple-500"></i> مساعد الذكاء الاصطناعي
+                        </h3>
+                        <button id="closeAIModal" class="text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-times text-2xl"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-gray-700 mb-2">ما نوع الموقع الذي تريد إنشاءه؟</label>
+                        <textarea id="aiPrompt" 
+                                  class="w-full p-3 border rounded-lg h-32" 
+                                  placeholder="أوصف موقعك المثالي... مثلاً: موقع لبيع المنتجات الإلكترونية مع قسم للمدونة ونموذج اتصال"></textarea>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div>
+                            <label class="block text-gray-700 mb-1">نوع الموقع</label>
+                            <select id="siteType" class="w-full p-2 border rounded">
+                                <option value="business">أعمال</option>
+                                <option value="portfolio">معرض أعمال</option>
+                                <option value="ecommerce">متجر إلكتروني</option>
+                                <option value="blog">مدونة</option>
+                                <option value="landing">صفحة هبوط</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 mb-1">النمط</label>
+                            <select id="siteStyle" class="w-full p-2 border rounded">
+                                <option value="modern">حديث</option>
+                                <option value="minimal">بسيط</option>
+                                <option value="elegant">أنيق</option>
+                                <option value="corporate">احترافي</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-3 rtl:space-x-reverse">
+                        <button id="cancelAI" class="px-4 py-2 border rounded-lg hover:bg-gray-50">
+                            إلغاء
+                        </button>
+                        <button id="generateWithAI" class="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600">
+                            <i class="fas fa-magic mr-2"></i> أنشئ الموقع
+                        </button>
+                    </div>
+                    
+                    <div id="aiLoading" class="hidden mt-4 text-center">
+                        <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-purple-500"></div>
+                        <p class="mt-2 text-gray-600">جاري إنشاء موقعك باستخدام الذكاء الاصطناعي...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة النشر على Vercel -->
+    <div id="vercelModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50">
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-md">
+            <div class="bg-white rounded-lg shadow-xl">
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold text-gray-800">
+                            <i class="fas fa-rocket text-indigo-500"></i> النشر على Vercel
+                        </h3>
+                        <button id="closeVercelModal" class="text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-times text-2xl"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-gray-700 mb-2">اسم المشروع</label>
+                        <input type="text" id="projectName" 
+                               class="w-full p-3 border rounded-lg" 
+                               placeholder="مثال: my-website">
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label class="block text-gray-700 mb-2">النطاق المخصص (اختياري)</label>
+                        <input type="text" id="customDomain" 
+                               class="w-full p-3 border rounded-lg" 
+                               placeholder="مثال: موقعي.com">
+                    </div>
+                    
+                    <div class="flex justify-end space-x-3 rtl:space-x-reverse">
+                        <button id="cancelVercel" class="px-4 py-2 border rounded-lg hover:bg-gray-50">
+                            إلغاء
+                        </button>
+                        <button id="deployToVercel" class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600">
+                            <i class="fas fa-rocket mr-2"></i> نشر الآن
+                        </button>
+                    </div>
+                    
+                    <div id="deployLoading" class="hidden mt-4">
+                        <div class="flex items-center space-x-3 rtl:space-x-reverse">
+                            <div class="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-indigo-500"></div>
+                            <p class="text-gray-600">جاري نشر موقعك على Vercel...</p>
+                        </div>
+                        <div class="mt-3 bg-gray-100 rounded-lg p-3">
+                            <p class="text-sm text-gray-700">سيكون موقعك متاحاً خلال بضع دقائق على:</p>
+                            <p id="deployUrl" class="text-sm text-indigo-600 font-mono mt-1"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
+    <script>
+        // بيانات التطبيق
+        const currentUser = {
+            id: '<%= user._id %>',
+            username: '<%= user.username %>',
+            email: '<%= user.email %>'
+        };
+
+        let currentSite = null;
+        let components = [];
+        let isDragging = false;
+
+        // تهيئة السحب والإفلات
+        function initializeDragAndDrop() {
+            const components = document.querySelectorAll('.component');
+            const previewArea = document.getElementById('websiteContent');
+            
+            components.forEach(component => {
+                component.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('type', component.dataset.type);
+                    component.classList.add('dragging');
+                });
+                
+                component.addEventListener('dragend', () => {
+                    component.classList.remove('dragging');
+                });
+            });
+            
+            previewArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                previewArea.classList.add('bg-blue-50');
+            });
+            
+            previewArea.addEventListener('dragleave', () => {
+                previewArea.classList.remove('bg-blue-50');
+            });
+            
+            previewArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                previewArea.classList.remove('bg-blue-50');
+                
+                const type = e.dataTransfer.getData('type');
+                if (type) {
+                    addComponent(type, e.clientX, e.clientY);
+                }
+            });
+        }
+
+        // إضافة مكون جديد
+        function addComponent(type, x, y) {
+            const component = createComponent(type);
+            const previewArea = document.getElementById('websiteContent');
+            
+            if (previewArea.children.length === 1 && 
+                previewArea.children[0].classList.contains('text-center')) {
+                previewArea.innerHTML = '';
+            }
+            
+            previewArea.appendChild(component);
+            components.push({
+                id: Date.now(),
+                type: type,
+                element: component
+            });
+            
+            // تحديث شريط الخصائص
+            updatePropertiesPanel(component);
+            
+            // إضافة حدث النقر على العنصر
+            component.addEventListener('click', (e) => {
+                e.stopPropagation();
+                selectComponent(component);
+            });
+        }
+
+        // إنشاء مكون
+        function createComponent(type) {
+            const div = document.createElement('div');
+            div.className = 'component-item p-4 mb-4 bg-white border rounded-lg relative';
+            div.setAttribute('data-type', type);
+            div.setAttribute('draggable', 'true');
+            
+            switch(type) {
+                case 'hero':
+                    div.innerHTML = `
+                        <div class="text-center py-12 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg">
+                            <h2 class="text-4xl font-bold mb-4">عنوان رئيسي جذاب</h2>
+                            <p class="text-xl mb-8">وصف قصير عن موقعك أو منتجك</p>
+                            <button class="px-8 py-3 bg-white text-blue-600 rounded-full font-semibold hover:bg-gray-100">
+                                ابدأ الآن
+                            </button>
+                        </div>
+                        <div class="absolute top-2 left-2 flex space-x-2 rtl:space-x-reverse">
+                            <button class="edit-component p-1 bg-blue-100 text-blue-600 rounded">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="delete-component p-1 bg-red-100 text-red-600 rounded">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'features':
+                    div.innerHTML = `
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="text-center p-6 border rounded-lg">
+                                <div class="text-4xl text-blue-500 mb-4">
+                                    <i class="fas fa-bolt"></i>
+                                </div>
+                                <h3 class="text-xl font-bold mb-2">سريع</h3>
+                                <p>وصف للميزة الأولى</p>
+                            </div>
+                            <div class="text-center p-6 border rounded-lg">
+                                <div class="text-4xl text-green-500 mb-4">
+                                    <i class="fas fa-shield-alt"></i>
+                                </div>
+                                <h3 class="text-xl font-bold mb-2">آمن</h3>
+                                <p>وصف للميزة الثانية</p>
+                            </div>
+                            <div class="text-center p-6 border rounded-lg">
+                                <div class="text-4xl text-purple-500 mb-4">
+                                    <i class="fas fa-cogs"></i>
+                                </div>
+                                <h3 class="text-xl font-bold mb-2">قابل للتخصيص</h3>
+                                <p>وصف للميزة الثالثة</p>
+                            </div>
+                        </div>
+                        <div class="absolute top-2 left-2 flex space-x-2 rtl:space-x-reverse">
+                            <button class="edit-component p-1 bg-blue-100 text-blue-600 rounded">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="delete-component p-1 bg-red-100 text-red-600 rounded">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+                    break;
+                    
+                default:
+                    div.innerHTML = `<p>مكون ${type}</p>`;
+            }
+            
+            // إضافة أحداث للأزرار
+            const editBtn = div.querySelector('.edit-component');
+            const deleteBtn = div.querySelector('.delete-component');
+            
+            if (editBtn) {
+                editBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    editComponent(div);
+                });
+            }
+            
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    deleteComponent(div);
+                });
+            }
+            
+            return div;
+        }
+
+        // تحديث شريط الخصائص
+        function updatePropertiesPanel(element) {
+            const panel = document.getElementById('propertiesPanel');
+            const type = element.getAttribute('data-type');
+            
+            panel.innerHTML = `
+                <div class="space-y-4">
+                    <div>
+                        <h4 class="font-semibold text-gray-700 mb-2">خصائص العنصر</h4>
+                        <p class="text-sm text-gray-600">${getComponentName(type)}</p>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1">الخلفية</label>
+                        <input type="color" class="w-full" value="#ffffff">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1">الحاشية</label>
+                        <input type="number" class="w-full p-2 border rounded" value="16" min="0" max="100">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1">الهامش</label>
+                        <input type="number" class="w-full p-2 border rounded" value="8" min="0" max="100">
+                    </div>
+                    
+                    <div class="pt-4 border-t">
+                        <button class="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                            حفظ التغييرات
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getComponentName(type) {
+            const names = {
+                'hero': 'قسم البطل',
+                'features': 'المميزات',
+                'testimonials': 'آراء العملاء',
+                'contact': 'نموذج الاتصال',
+                'gallery': 'معرض الصور'
+            };
+            return names[type] || type;
+        }
+
+        // حفظ الموقع
+        async function saveSite() {
+            const content = {
+                html: document.getElementById('websiteContent').innerHTML,
+                css: '',
+                js: ''
+            };
+            
+            try {
+                const response = await fetch('/api/sites/save', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({
+                        name: document.getElementById('projectName').value || 'موقع جديد',
+                        content: content,
+                        settings: {
+                            primaryColor: document.getElementById('primaryColor').value,
+                            fontFamily: document.getElementById('fontFamily').value
+                        }
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentSite = data.data.site;
+                    showNotification('تم حفظ الموقع بنجاح', 'success');
+                } else {
+                    showNotification(data.message, 'error');
+                }
+            } catch (error) {
+                console.error('❌ خطأ في الحفظ:', error);
+                showNotification('حدث خطأ في الحفظ', 'error');
+            }
+        }
+
+        // إنشاء موقع بالذكاء الاصطناعي
+        async function generateSiteWithAI() {
+            const prompt = document.getElementById('aiPrompt').value;
+            const type = document.getElementById('siteType').value;
+            const style = document.getElementById('siteStyle').value;
+            
+            if (!prompt.trim()) {
+                showNotification('يرجى كتابة وصف للموقع', 'error');
+                return;
+            }
+            
+            document.getElementById('aiLoading').classList.remove('hidden');
+            
+            try {
+                const response = await fetch('/ai/generate-website', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({
+                        prompt: prompt,
+                        type: type,
+                        style: style
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // عرض النتيجة
+                    document.getElementById('websiteContent').innerHTML = data.data.html;
+                    
+                    // إضافة CSS و JS
+                    const styleTag = document.createElement('style');
+                    styleTag.textContent = data.data.css;
+                    document.head.appendChild(styleTag);
+                    
+                    const scriptTag = document.createElement('script');
+                    scriptTag.textContent = data.data.js;
+                    document.body.appendChild(scriptTag);
+                    
+                    currentSite = { id: data.data.siteId };
+                    showNotification('تم إنشاء الموقع بنجاح!', 'success');
+                    closeAIModal();
+                } else {
+                    showNotification(data.message, 'error');
+                }
+            } catch (error) {
+                console.error('❌ خطأ في إنشاء الموقع:', error);
+                showNotification('حدث خطأ في إنشاء الموقع', 'error');
+            } finally {
+                document.getElementById('aiLoading').classList.add('hidden');
+            }
+        }
+
+        // نشر على Vercel
+        async function deployToVercel() {
+            if (!currentSite) {
+                showNotification('يرجى حفظ الموقع أولاً', 'error');
+                return;
+            }
+            
+            const projectName = document.getElementById('projectName').value;
+            const customDomain = document.getElementById('customDomain').value;
+            
+            document.getElementById('deployLoading').classList.remove('hidden');
+            
+            try {
+                const response = await fetch(`/vercel/deploy/${currentSite.id}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({
+                        projectName: projectName,
+                        domain: customDomain
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('deployUrl').textContent = data.data.url;
+                    showNotification('جاري نشر الموقع...', 'success');
+                    
+                    // تتبع حالة النشر
+                    trackDeploymentStatus(data.data.deploymentId);
+                } else {
+                    showNotification(data.message, 'error');
+                }
+            } catch (error) {
+                console.error('❌ خطأ في النشر:', error);
+                showNotification('حدث خطأ في النشر', 'error');
+            }
+        }
+
+        // تتبع حالة النشر
+        async function trackDeploymentStatus(deploymentId) {
+            try {
+                const response = await fetch(`/vercel/deployment/${deploymentId}/status`);
+                const data = await response.json();
+                
+                if (data.data.readyState === 'READY') {
+                    showNotification('تم نشر الموقع بنجاح!', 'success');
+                    document.getElementById('deployLoading').innerHTML += `
+                        <div class="mt-3 p-3 bg-green-50 text-green-700 rounded-lg">
+                            <i class="fas fa-check-circle"></i>
+                            <span class="mr-2">تم النشر بنجاح!</span>
+                            <a href="${data.data.url}" target="_blank" class="underline">زيارة الموقع</a>
+                        </div>
+                    `;
+                } else if (data.data.readyState === 'ERROR') {
+                    showNotification('فشل في نشر الموقع', 'error');
+                } else {
+                    // إعادة المحاولة بعد 3 ثوان
+                    setTimeout(() => trackDeploymentStatus(deploymentId), 3000);
+                }
+            } catch (error) {
+                console.error('❌ خطأ في تتبع النشر:', error);
+            }
+        }
+
+        // عرض الإشعارات
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
+                type === 'success' ? 'bg-green-500 text-white' :
+                type === 'error' ? 'bg-red-500 text-white' :
+                'bg-blue-500 text-white'
+            }`;
+            notification.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas fa-${type === 'success' ? 'check' : 'exclamation'}-circle mr-2"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // أحداث الأزرار
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeDragAndDrop();
+            
+            // زر الحفظ
+            document.getElementById('saveBtn').addEventListener('click', saveSite);
+            
+            // زر المعاينة
+            document.getElementById('previewBtn').addEventListener('click', () => {
+                window.open('/preview', '_blank');
+            });
+            
+            // زر الذكاء الاصطناعي
+            document.getElementById('aiBtn').addEventListener('click', () => {
+                document.getElementById('aiModal').classList.remove('hidden');
+            });
+            
+            document.getElementById('startWithAI').addEventListener('click', () => {
+                document.getElementById('aiModal').classList.remove('hidden');
+            });
+            
+            // زر النشر
+            document.getElementById('publishBtn').addEventListener('click', () => {
+                if (!currentSite) {
+                    if (confirm('يجب حفظ الموقع أولاً. هل تريد الحفظ الآن؟')) {
+                        saveSite().then(() => {
+                            document.getElementById('vercelModal').classList.remove('hidden');
+                        });
+                    }
+                } else {
+                    document.getElementById('vercelModal').classList.remove('hidden');
+                }
+            });
+            
+            // إغلاق نافذة الذكاء
+            document.getElementById('closeAIModal').addEventListener('click', closeAIModal);
+            document.getElementById('cancelAI').addEventListener('click', closeAIModal);
+            
+            // توليد بالذكاء
+            document.getElementById('generateWithAI').addEventListener('click', generateSiteWithAI);
+            
+            // إغلاق نافذة Vercel
+            document.getElementById('closeVercelModal').addEventListener('click', closeVercelModal);
+            document.getElementById('cancelVercel').addEventListener('click', closeVercelModal);
+            
+            // النشر على Vercel
+            document.getElementById('deployToVercel').addEventListener('click', deployToVercel);
+            
+            // أزرار الذكاء في الشريط الجانبي
+            document.getElementById('generateSiteBtn').addEventListener('click', () => {
+                document.getElementById('aiModal').classList.remove('hidden');
+            });
+        });
+
+        function closeAIModal() {
+            document.getElementById('aiModal').classList.add('hidden');
+        }
+
+        function closeVercelModal() {
+            document.getElementById('vercelModal').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
