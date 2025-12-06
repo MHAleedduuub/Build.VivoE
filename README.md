@@ -26,5 +26,5 @@
 
 1. **استنساخ المشروع**
 ```bash
-git clone https://github.com/MHAleedduuub/gemini-website-builder.git
-cd gemini-website-builder
+git clone https://github.com/MHAleedduuub/Build.VivoE.git
+cd Build.VivoE
