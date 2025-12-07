@@ -1,6 +1,8 @@
 require('dotenv').config();
 const express = require('express');
+const mongoose = require('mongoose');
 const path = require('path');
+const fs = require('fs');
 
 const app = express();
 
@@ -13,107 +15,253 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// صفحة الاختبار
-app.get('/', (req, res) => {
-  res.send(`
-    <!DOCTYPE html>
-    <html lang="ar">
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>✅ الموقع يعمل</title>
-      <style>
-        body {
-          font-family: Arial, sans-serif;
-          text-align: center;
-          padding: 50px;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          color: white;
+// الاتصال بقاعدة البيانات
+async function connectDB() {
+    try {
+        if (process.env.MONGODB_URI) {
+            await mongoose.connect(process.env.MONGODB_URI, {
+                useNewUrlParser: true,
+                useUnifiedTopology: true
+            });
+            console.log('✅ تم الاتصال بـ MongoDB');
+            return true;
         }
-        .container {
-          background: rgba(255,255,255,0.1);
-          padding: 40px;
-          border-radius: 15px;
-          max-width: 600px;
-          margin: 0 auto;
+        return false;
+    } catch (error) {
+        console.error('❌ خطأ في MongoDB:', error.message);
+        return false;
+    }
+}
+
+// ===== ربط ملفات HTML مع تحويلها إلى EJS =====
+
+// دالة لقراءة ملف HTML وتحويله إلى EJS
+function convertHTMLtoEJS(htmlFilePath) {
+    try {
+        if (fs.existsSync(htmlFilePath)) {
+            let content = fs.readFileSync(htmlFilePath, 'utf8');
+            
+            // تحويل مسارات CSS وJS لتصبح نسبية
+            content = content.replace(/href="\/css\//g, 'href="/css/');
+            content = content.replace(/src="\/js\//g, 'src="/js/');
+            content = content.replace(/src="\/images\//g, 'src="/images/');
+            
+            // إضافة متغيرات ديناميكية
+            content = content.replace('<body>', `<body data-node-env="${process.env.NODE_ENV}">`);
+            
+            return content;
         }
-        h1 { font-size: 3em; margin-bottom: 20px; }
-        .success { color: #4ade80; font-size: 1.5em; }
-        .info { margin: 20px 0; }
-        .btn {
-          display: inline-block;
-          background: white;
-          color: #667eea;
-          padding: 12px 30px;
-          border-radius: 30px;
-          text-decoration: none;
-          margin: 10px;
-          font-weight: bold;
-        }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-        <h1>🚀 الموقع يعمل بنجاح!</h1>
-        <div class="success">✅ Server is running</div>
-        <div class="info">
-          <p><strong>الخطوة التالية:</strong></p>
-          <p>1. تحقق من أن جميع الملفات موجودة</p>
-          <p>2. تأكد من Environment Variables</p>
-          <p>3. تحقق من Logs في Vercel</p>
-        </div>
-        <div>
-          <a href="/health" class="btn">تحقق من الصحة</a>
-          <a href="/test" class="btn">صفحة تجريبية</a>
-        </div>
-      </div>
-    </body>
-    </html>
-  `);
+        return '<h1>الصفحة غير موجودة</h1>';
+    } catch (error) {
+        console.error('❌ خطأ في قراءة الملف:', error.message);
+        return '<h1>خطأ في تحميل الصفحة</h1>';
+    }
+}
+
+// ===== الصفحات الرئيسية =====
+
+// الرئيسية
+app.get('/', async (req, res) => {
+    const htmlContent = convertHTMLtoEJS(path.join(__dirname, 'public/pages/index.html'));
+    res.send(htmlContent);
 });
+
+// لوحة التحكم
+app.get('/dashboard', async (req, res) => {
+    const htmlContent = convertHTMLtoEJS(path.join(__dirname, 'public/pages/dashboard.html'));
+    res.send(htmlContent);
+});
+
+// منشئ المواقع
+app.get('/builder', async (req, res) => {
+    const htmlContent = convertHTMLtoEJS(path.join(__dirname, 'public/pages/builder.html'));
+    res.send(htmlContent);
+});
+
+// الذكاء الاصطناعي
+app.get('/ai/create', async (req, res) => {
+    const htmlContent = convertHTMLtoEJS(path.join(__dirname, 'public/pages/ai-create.html'));
+    res.send(htmlContent);
+});
+
+// تسجيل الدخول
+app.get('/login', async (req, res) => {
+    const htmlContent = convertHTMLtoEJS(path.join(__dirname, 'public/pages/login.html'));
+    res.send(htmlContent);
+});
+
+// إنشاء حساب
+app.get('/register', async (req, res) => {
+    const htmlContent = convertHTMLtoEJS(path.join(__dirname, 'public/pages/register.html'));
+    res.send(htmlContent);
+});
+
+// القوالب
+app.get('/templates', async (req, res) => {
+    const htmlContent = convertHTMLtoEJS(path.join(__dirname, 'public/pages/templates.html'));
+    res.send(htmlContent);
+});
+
+// ===== API =====
 
 // صفحة التحقق من الصحة
-app.get('/health', (req, res) => {
-  res.json({
-    status: 'healthy',
-    timestamp: new Date().toISOString(),
-    node: process.version,
-    env: process.env.NODE_ENV || 'development',
-    mongodb: process.env.MONGODB_URI ? '✅ موجود' : '❌ مفقود',
-    gemini: process.env.GEMINI_API_KEY ? '✅ موجود' : '❌ مفقود',
-    port: process.env.PORT || 3000
-  });
+app.get('/api/health', async (req, res) => {
+    const dbConnected = await connectDB();
+    
+    res.json({
+        status: 'running',
+        server: 'Node.js + Express',
+        database: dbConnected ? 'connected' : 'disconnected',
+        gemini: process.env.GEMINI_API_KEY ? 'available' : 'unavailable',
+        vercel: process.env.VERCEL_TOKEN ? 'configured' : 'not-configured',
+        timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV || 'development'
+    });
 });
 
-// صفحة تجريبية
-app.get('/test', (req, res) => {
-  res.render('test', { 
-    title: 'صفحة تجريبية',
-    message: '🎉 تم تحميل EJS بنجاح!'
-  });
+// API للذكاء الاصطناعي (مثال)
+app.post('/api/ai/generate', async (req, res) => {
+    try {
+        const { prompt } = req.body;
+        
+        // هنا ستدمج Gemini AI
+        res.json({
+            success: true,
+            message: 'سيتم دمج Gemini AI هنا',
+            prompt: prompt
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
 });
+
+// API للنشر على Vercel (مثال)
+app.post('/api/vercel/deploy', async (req, res) => {
+    try {
+        const { siteName, content } = req.body;
+        
+        // هنا ستدمج Vercel API
+        res.json({
+            success: true,
+            message: 'سيتم دمج Vercel API هنا',
+            siteName: siteName,
+            url: `https://${siteName}.vercel.app`
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
+
+// ===== التعامل مع ملفات ثابتة =====
+
+// CSS
+app.get('/css/:file', (req, res) => {
+    const filePath = path.join(__dirname, 'public/css', req.params.file);
+    if (fs.existsSync(filePath)) {
+        res.sendFile(filePath);
+    } else {
+        res.status(404).send('ملف CSS غير موجود');
+    }
+});
+
+// JS
+app.get('/js/:file', (req, res) => {
+    const filePath = path.join(__dirname, 'public/js', req.params.file);
+    if (fs.existsSync(filePath)) {
+        res.sendFile(filePath);
+    } else {
+        res.status(404).send('ملف JS غير موجود');
+    }
+});
+
+// Images
+app.get('/images/:file', (req, res) => {
+    const filePath = path.join(__dirname, 'public/images', req.params.file);
+    if (fs.existsSync(filePath)) {
+        res.sendFile(filePath);
+    } else {
+        res.status(404).send('الصورة غير موجودة');
+    }
+});
+
+// ===== الصفحات الخاصة =====
 
 // 404
-app.use((req, res) => {
-  res.status(404).send('الصفحة غير موجودة');
+app.get('/404', (req, res) => {
+    const htmlContent = convertHTMLtoEJS(path.join(__dirname, 'public/pages/404.html'));
+    res.send(htmlContent);
+});
+
+// catch all route للصفحات الأخرى
+app.get('*', (req, res) => {
+    const requestedPath = req.path;
+    
+    // تحقق إذا كان هناك ملف HTML بنفس الاسم
+    const htmlFilePath = path.join(__dirname, 'public/pages', requestedPath + '.html');
+    
+    if (fs.existsSync(htmlFilePath)) {
+        const htmlContent = convertHTMLtoEJS(htmlFilePath);
+        res.send(htmlContent);
+    } else {
+        // إعادة توجيه إلى 404
+        const notFoundContent = convertHTMLtoEJS(path.join(__dirname, 'public/pages/404.html'));
+        res.status(404).send(notFoundContent);
+    }
 });
 
 // معالج الأخطاء
 app.use((err, req, res, next) => {
-  console.error('خطأ:', err);
-  res.status(500).send(`
-    <h1>خطأ في السيرفر</h1>
-    <p><strong>الرسالة:</strong> ${err.message}</p>
-    <p><strong>التفاصيل:</strong> ${err.stack}</p>
-    <a href="/">العودة للصفحة الرئيسية</a>
-  `);
+    console.error('❌ خطأ:', err);
+    const errorContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>خطأ في السيرفر</title>
+            <style>
+                body { font-family: Arial; text-align: center; padding: 50px; }
+                h1 { color: #dc2626; }
+            </style>
+        </head>
+        <body>
+            <h1>🚨 خطأ في السيرفر</h1>
+            <p>${err.message}</p>
+            <a href="/">العودة للصفحة الرئيسية</a>
+        </body>
+        </html>
+    `;
+    res.status(500).send(errorContent);
 });
 
+// ===== بدء السيرفر =====
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`✅ السيرفر يعمل على port ${PORT}`);
-  console.log(`🌐 Environment: ${process.env.NODE_ENV}`);
-  console.log(`📁 Views: ${path.join(__dirname, 'views')}`);
+app.listen(PORT, async () => {
+    console.log(`🚀 السيرفر يعمل على: http://localhost:${PORT}`);
+    console.log(`🌐 Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`📁 Public files: ${path.join(__dirname, 'public')}`);
+    console.log(`📄 HTML Pages: ${path.join(__dirname, 'public/pages')}`);
+    
+    // الاتصال بقاعدة البيانات
+    await connectDB();
+    
+    // عرض جميع المسارات المتاحة
+    console.log('\n📡 المسارات المتاحة:');
+    console.log('  /              - الرئيسية');
+    console.log('  /dashboard     - لوحة التحكم');
+    console.log('  /builder       - منشئ المواقع');
+    console.log('  /ai/create     - الذكاء الاصطناعي');
+    console.log('  /login         - تسجيل الدخول');
+    console.log('  /register      - إنشاء حساب');
+    console.log('  /templates     - القوالب');
+    console.log('  /api/health    - التحقق من الصحة');
+    console.log('  /css/*         - ملفات CSS');
+    console.log('  /js/*          - ملفات JavaScript');
+    console.log('  /images/*      - الصور');
 });
 
 module.exports = app;
