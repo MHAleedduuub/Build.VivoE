@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔐 تسجيل الدخول - منشئ المواقع</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/auth.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        .auth-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .auth-logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .auth-logo i {
+            font-size: 3rem;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        .auth-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-align: center;
+            color: #1f2937;
+        }
+        .auth-subtitle {
+            text-align: center;
+            color: #6b7280;
+            margin-bottom: 30px;
+        }
+        .auth-form {
+            margin-bottom: 25px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+        }
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #6b7280;
+        }
+        .forgot-password {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .forgot-password:hover {
+            text-decoration: underline;
+        }
+        .auth-button {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .auth-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            margin: 25px 0;
+            color: #9ca3af;
+        }
+        .auth-divider::before,
+        .auth-divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: #e5e7eb;
+        }
+        .auth-divider span {
+            padding: 0 15px;
+            background: white;
+        }
+        .social-login {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .social-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 14px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        .social-btn:hover {
+            background: #f9fafb;
+            transform: translateY(-2px);
+        }
+        .google-btn {
+            color: #db4437;
+        }
+        .github-btn {
+            color: #333;
+        }
+        .auth-footer {
+            text-align: center;
+            margin-top: 25px;
+            color: #6b7280;
+        }
+        .auth-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            margin-right: 5px;
+        }
+        .auth-link:hover {
+            text-decoration: underline;
+        }
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+        .alert-info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
+        }
+        .password-toggle {
+            position: relative;
+        }
+        .password-toggle i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <!-- الشعار -->
+            <div class="auth-logo">
+                <i class="fas fa-globe"></i>
+                <h1 class="auth-title">مرحباً بعودتك!</h1>
+                <p class="auth-subtitle">سجل الدخول للوصول إلى حسابك وإنشاء مواقع جديدة</p>
+            </div>
+
+            <!-- التنبيهات -->
+            <div class="alert alert-info" id="info-alert">
+                <i class="fas fa-info-circle"></i>
+                <span>يمكنك استخدام الحساب التجريبي: test@example.com / password123</span>
+            </div>
+
+            <div class="alert alert-error" id="error-alert" style="display: none;">
+                <i class="fas fa-exclamation-circle"></i>
+                <span id="error-message"></span>
+            </div>
+
+            <!-- النموذج -->
+            <form class="auth-form" id="login-form">
+                <div class="form-group">
+                    <label class="form-label">البريد الإلكتروني</label>
+                    <input type="email" class="form-input" id="email" 
+                           placeholder="example@email.com" required>
+                </div>
+
+                <div class="form-group password-toggle">
+                    <label class="form-label">كلمة المرور</label>
+                    <input type="password" class="form-input" id="password" 
+                           placeholder="أدخل كلمة المرور" required>
+                    <i class="fas fa-eye" id="toggle-password"></i>
+                </div>
+
+                <div class="form-options">
+                    <label class="remember-me">
+                        <input type="checkbox" id="remember">
+                        <span>تذكرني</span>
+                    </label>
+                    <a href="/forgot-password" class="forgot-password">
+                        نسيت كلمة المرور؟
+                    </a>
+                </div>
+
+                <button type="submit" class="auth-button" id="login-btn">
+                    <i class="fas fa-sign-in-alt"></i>
+                    تسجيل الدخول
+                </button>
+            </form>
+
+            <!-- تسجيل الدخول عبر وسائل التواصل -->
+            <div class="auth-divider">
+                <span>أو سجل الدخول باستخدام</span>
+            </div>
+
+            <div class="social-login">
+                <button class="social-btn google-btn" onclick="loginWithGoogle()">
+                    <i class="fab fa-google"></i>
+                    Google
+                </button>
+                <button class="social-btn github-btn" onclick="loginWithGithub()">
+                    <i class="fab fa-github"></i>
+                    GitHub
+                </button>
+            </div>
+
+            <!-- روابط -->
+            <div class="auth-footer">
+                <p>ليس لديك حساب؟ 
+                    <a href="/register" class="auth-link">أنشئ حساب جديد</a>
+                </p>
+                <p style="margin-top: 15px;">
+                    <a href="/" class="auth-link">
+                        <i class="fas fa-arrow-right"></i>
+                        العودة للصفحة الرئيسية
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // إظهار/إخفاء كلمة المرور
+        document.getElementById('toggle-password').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
+
+        // تسجيل الدخول
+        document.getElementById('login-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const remember = document.getElementById('remember').checked;
+            
+            const loginBtn = document.getElementById('login-btn');
+            const errorAlert = document.getElementById('error-alert');
+            const errorMessage = document.getElementById('error-message');
+            
+            // إظهار التحميل
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري تسجيل الدخول...';
+            loginBtn.disabled = true;
+            
+            try {
+                // محاكاة تسجيل الدخول (في الإصدار الحقيقي، ستستخدم API)
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                // تحقق من الحساب التجريبي
+                if (email === 'test@example.com' && password === 'password123') {
+                    // حفظ حالة تسجيل الدخول
+                    localStorage.setItem('userLoggedIn', 'true');
+                    localStorage.setItem('userEmail', email);
+                    
+                    if (remember) {
+                        localStorage.setItem('rememberMe', 'true');
+                    }
+                    
+                    // توجيه إلى لوحة التحكم
+                    window.location.href = '/dashboard';
+                } else {
+                    throw new Error('البريد الإلكتروني أو كلمة المرور غير صحيحة');
+                }
+                
+            } catch (error) {
+                // إظهار الخطأ
+                errorMessage.textContent = error.message;
+                errorAlert.style.display = 'block';
+                
+                // إعادة تعيين الزر
+                loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> تسجيل الدخول';
+                loginBtn.disabled = false;
+            }
+        });
+
+        // تسجيل الدخول بـ Google
+        function loginWithGoogle() {
+            document.getElementById('info-alert').innerHTML = 
+                '<i class="fas fa-info-circle"></i> جاري التوجيه إلى Google...';
+            
+            // محاكاة تسجيل الدخول بـ Google
+            setTimeout(() => {
+                localStorage.setItem('userLoggedIn', 'true');
+                localStorage.setItem('userEmail', 'google-user@example.com');
+                window.location.href = '/dashboard';
+            }, 1000);
+        }
+
+        // تسجيل الدخول بـ GitHub
+        function loginWithGithub() {
+            document.getElementById('info-alert').innerHTML = 
+                '<i class="fas fa-info-circle"></i> جاري التوجيه إلى GitHub...';
+            
+            // محاكاة تسجيل الدخول بـ GitHub
+            setTimeout(() => {
+                localStorage.setItem('userLoggedIn', 'true');
+                localStorage.setItem('userEmail', 'github-user@example.com');
+                window.location.href = '/dashboard';
+            }, 1000);
+        }
+
+        // التحقق من تسجيل الدخول السابق
+        document.addEventListener('DOMContentLoaded', function() {
+            if (localStorage.getItem('userLoggedIn') === 'true') {
+                window.location.href = '/dashboard';
+            }
+        });
+    </script>
+</body>
+</html>
