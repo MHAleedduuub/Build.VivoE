@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>😕 404 - الصفحة غير موجودة</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .error-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .error-content {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 50px 40px;
+            border-radius: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .error-icon {
+            font-size: 8rem;
+            margin-bottom: 30px;
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        .error-title {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+        .error-message {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+        .error-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        .error-btn {
+            padding: 15px 30px;
+            background: white;
+            color: #667eea;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .error-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(255, 255, 255, 0.3);
+        }
+        .error-btn.secondary {
+            background: transparent;
+            border: 2px solid white;
+            color: white;
+        }
+        .search-box {
+            position: relative;
+            max-width: 400px;
+            margin: 30px auto;
+        }
+        .search-input {
+            width: 100%;
+            padding: 15px 50px 15px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.9);
+        }
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #667eea;
+        }
+        .suggestions {
+            margin-top: 30px;
+            text-align: right;
+        }
+        .suggestions h3 {
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        .suggestions-list {
+            list-style: none;
+            padding: 0;
+        }
+        .suggestions-list li {
+            margin-bottom: 10px;
+        }
+        .suggestions-list a {
+            color: white;
+            text-decoration: none;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+        .suggestions-list a:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+        .footer {
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            width: 100%;
+            max-width: 600px;
+        }
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+        }
+        .footer-links {
+            display: flex;
+            gap: 20px;
+        }
+        .footer-links a {
+            color: white;
+            opacity: 0.8;
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+        .footer-links a:hover {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="error-content">
+            <!-- الأيقونة -->
+            <div class="error-icon">😕</div>
+            
+            <!-- العنوان -->
+            <h1 class="error-title">404 - الصفحة غير موجودة</h1>
+            
+            <!-- الرسالة -->
+            <p class="error-message">
+                عذراً، لم نتمكن من العثور على الصفحة التي تبحث عنها.<br>
+                ربما تم نقلها أو حذفها، أو ربما أخطأت في كتابة العنوان.
+            </p>
+
+            <!-- مربع البحث -->
+            <div class="search-box">
+                <input type="text" class="search-input" placeholder="ابحث في الموقع...">
+                <i class="fas fa-search search-icon"></i>
+            </div>
+
+            <!-- الأزرار -->
+            <div class="error-actions">
+                <a href="/" class="error-btn">
+                    <i class="fas fa-home"></i>
+                    العودة للصفحة الرئيسية
+                </a>
+                <a href="/dashboard" class="error-btn secondary">
+                    <i class="fas fa-tachometer-alt"></i>
+                    لوحة التحكم
+                </a>
+                <a href="/builder" class="error-btn secondary">
+                    <i class="fas fa-paint-brush"></i>
+                    منشئ المواقع
+                </a>
+                <button onclick="window.history.back()" class="error-btn secondary">
+                    <i class="fas fa-arrow-right"></i>
+                    الرجوع للخلف
+                </button>
+            </div>
+
+            <!-- اقتراحات -->
+            <div class="suggestions">
+                <h3>ربما تبحث عن:</h3>
+                <ul class="suggestions-list">
+                    <li><a href="/"><i class="fas fa-home"></i> الصفحة الرئيسية</a></li>
+                    <li><a href="/dashboard"><i class="fas fa-tachometer-alt"></i> لوحة التحكم</a></li>
+                    <li><a href="/builder"><i class="fas fa-paint-brush"></i> منشئ المواقع</a></li>
+                    <li><a href="/ai/create"><i class="fas fa-robot"></i> الذكاء الاصطناعي</a></li>
+                    <li><a href="/templates"><i class="fas fa-th-large"></i> القوالب الجاهزة</a></li>
+                    <li><a href="/login"><i class="fas fa-sign-in-alt"></i> تسجيل الدخول</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- التذييل -->
+        <div class="footer">
+            <div class="footer-content">
+                <a href="/" class="logo">
+                    <i class="fas fa-globe"></i>
+                    منشئ المواقع
+                </a>
+                <div class="footer-links">
+                    <a href="/help">المساعدة</a>
+                    <a href="/contact">اتصل بنا</a>
+                    <a href="/privacy">الخصوصية</a>
+                    <a href="/terms">الشروط</a>
+                </div>
+            </div>
+            <p style="text-align: center; margin-top: 20px; opacity: 0.7;">
+                © 2024 منشئ المواقع بالذكاء الاصطناعي. جميع الحقوق محفوظة.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // البحث
+        const searchInput = document.querySelector('.search-input');
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const query = this.value.trim();
+                if (query) {
+                    alert(`جارٍ البحث عن: "${query}"`);
+                    // في الإصدار الحقيقي، ستقوم بإعادة التوجيه لصفحة البحث
+                }
+            }
+        });
+
+        // إضافة تأثير الكتابة
+        const errorMessage = document.querySelector('.error-message');
+        const originalText = errorMessage.textContent;
+        errorMessage.textContent = '';
+        
+        let i = 0;
+        function typeWriter() {
+            if (i < originalText.length) {
+                errorMessage.textContent += originalText.charAt(i);
+                i++;
+                setTimeout(typeWriter, 30);
+            }
+        }
+        
+        // بدء الكتابة بعد تأخير بسيط
+        setTimeout(typeWriter, 500);
+
+        // تتبع النقرات
+        document.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                if (this.getAttribute('href') === '#') {
+                    e.preventDefault();
+                    alert('هذا الرابط تجريبي فقط');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
