@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 منشئ المواقع بالذكاء الاصطناعي</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 80px 20px;
+            text-align: center;
+            border-radius: 0 0 40px 40px;
+            margin-bottom: 60px;
+        }
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+        }
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto 30px;
+            opacity: 0.9;
+        }
+        .hero-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+        .feature-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+        .feature-icon {
+            font-size: 3rem;
+            color: #3B82F6;
+            margin-bottom: 20px;
+        }
+        .steps-container {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin: 40px 0;
+            flex-wrap: wrap;
+        }
+        .step {
+            text-align: center;
+            max-width: 250px;
+        }
+        .step-number {
+            width: 60px;
+            height: 60px;
+            background: #3B82F6;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 0 auto 20px;
+        }
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin: 40px 0;
+            color: #1F2937;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- شريط التنقل -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">
+                <i class="fas fa-globe"></i>
+                <span>منشئ المواقع</span>
+            </a>
+            
+            <div class="nav-links">
+                <a href="/" class="nav-link active"><i class="fas fa-home"></i> الرئيسية</a>
+                <a href="/dashboard" class="nav-link"><i class="fas fa-tachometer-alt"></i> لوحة التحكم</a>
+                <a href="/builder" class="nav-link"><i class="fas fa-paint-brush"></i> منشئ المواقع</a>
+                <a href="/ai/create" class="nav-link"><i class="fas fa-robot"></i> الذكاء الاصطناعي</a>
+                <a href="/templates" class="nav-link"><i class="fas fa-th-large"></i> القوالب</a>
+            </div>
+            
+            <div class="user-menu">
+                <a href="/login" class="btn btn-outline"><i class="fas fa-sign-in-alt"></i> تسجيل الدخول</a>
+                <a href="/register" class="btn btn-primary"><i class="fas fa-user-plus"></i> إنشاء حساب</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- المحتوى الرئيسي -->
+    <main class="container">
+        <!-- قسم البطل -->
+        <section class="hero">
+            <h1>أنشئ موقعك بالذكاء الاصطناعي في دقائق</h1>
+            <p>لا تحتاج إلى خبرة في البرمجة، فقط صف ما تريد وسننشئه لك تلقائياً</p>
+            <div class="hero-buttons">
+                <a href="/ai/create" class="btn btn-primary btn-lg" style="background: white; color: #667eea; padding: 15px 30px; font-size: 1.1rem;">
+                    <i class="fas fa-robot"></i> أنشئ بالذكاء الاصطناعي
+                </a>
+                <a href="/builder" class="btn btn-outline btn-lg" style="background: transparent; border: 2px solid white; color: white; padding: 15px 30px; font-size: 1.1rem;">
+                    <i class="fas fa-paint-brush"></i> ابدأ البناء يدوياً
+                </a>
+            </div>
+        </section>
+
+        <!-- المميزات -->
+        <section>
+            <h2 class="section-title">🎯 مميزات المنصة</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <h3>الذكاء الاصطناعي</h3>
+                    <p>أنشئ موقعاً كاملاً بواسطة Gemini AI مع وصف بسيط، لا تحتاج لكتابة أي كود</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-mouse-pointer"></i>
+                    </div>
+                    <h3>السحب والإفلات</h3>
+                    <p>صمم موقعك بسهولة بواسطة واجهة مرئية، اسحب المكونات وأفلتها حيث تريد</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <h3>النشر الفوري</h3>
+                    <p>انشر موقعك على Vercel بنقرة واحدة مع نطاق مجاني وشهادة SSL</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3>تصميم متجاوب</h3>
+                    <p>مواقعك تعمل بشكل مثالي على جميع الأجهزة والهواتف</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>تحليل SEO</h3>
+                    <p>تحسين تلقائي لمحركات البحث لزيادة ظهور موقعك</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h3>أداء سريع</h3>
+                    <p>مواقع سريعة التحميل مع تقنيات حديثة للتحسين</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- الخطوات -->
+        <section>
+            <h2 class="section-title">📝 كيف تعمل المنصة؟</h2>
+            <div class="steps-container">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>صف موقعك</h3>
+                    <p>أخبرنا عن موقعك المثالي باستخدام الذكاء الاصطناعي أو اختر من القوالب</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>صمم وعدل</h3>
+                    <p>استخدم أدوات السحب والإفلات لتعديل التصميم كما تريد</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>انشر مباشرة</h3>
+                    <p>انشر موقعك مباشرة على Vercel وشاهده يعمل على الإنترنت</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- إحصائيات -->
+        <section style="background: #f8fafc; padding: 60px 30px; border-radius: 20px; margin: 60px 0; text-align: center;">
+            <h2 class="section-title" style="color: #1F2937;">📊 إحصائيات المنصة</h2>
+            <div style="display: flex; justify-content: center; gap: 50px; flex-wrap: wrap;">
+                <div>
+                    <div style="font-size: 3rem; font-weight: bold; color: #3B82F6;">1,234+</div>
+                    <div style="color: #6B7280;">مواقع منشأة</div>
+                </div>
+                <div>
+                    <div style="font-size: 3rem; font-weight: bold; color: #10B981;">5,678+</div>
+                    <div style="color: #6B7280;">مستخدم مسجل</div>
+                </div>
+                <div>
+                    <div style="font-size: 3rem; font-weight: bold; color: #8B5CF6;">99.9%</div>
+                    <div style="color: #6B7280;">وقت تشغيل</div>
+                </div>
+                <div>
+                    <div style="font-size: 3rem; font-weight: bold; color: #F59E0B;">4.8 ★</div>
+                    <div style="color: #6B7280;">تقييم المستخدمين</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- التذييل -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3><i class="fas fa-globe"></i> منشئ المواقع</h3>
+                <p>منصة متكاملة لإنشاء مواقع الويب باستخدام الذكاء الاصطناعي مع نشر فوري</p>
+                <div style="margin-top: 15px;">
+                    <a href="#" style="color: white; margin-right: 10px;"><i class="fab fa-twitter"></i></a>
+                    <a href="#" style="color: white; margin-right: 10px;"><i class="fab fa-facebook"></i></a>
+                    <a href="#" style="color: white; margin-right: 10px;"><i class="fab fa-github"></i></a>
+                    <a href="#" style="color: white;"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3>روابط سريعة</h3>
+                <ul style="list-style: none; padding: 0;">
+                    <li><a href="/" style="color: #d1d5db; text-decoration: none;">🏠 الرئيسية</a></li>
+                    <li><a href="/dashboard" style="color: #d1d5db; text-decoration: none;">📊 لوحة التحكم</a></li>
+                    <li><a href="/builder" style="color: #d1d5db; text-decoration: none;">🎨 منشئ المواقع</a></li>
+                    <li><a href="/templates" style="color: #d1d5db; text-decoration: none;">📁 القوالب</a></li>
+                    <li><a href="/pricing" style="color: #d1d5db; text-decoration: none;">💰 الأسعار</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>الدعم</h3>
+                <ul style="list-style: none; padding: 0;">
+                    <li><a href="/contact" style="color: #d1d5db; text-decoration: none;">📞 اتصل بنا</a></li>
+                    <li><a href="/help" style="color: #d1d5db; text-decoration: none;">❓ التعليمات</a></li>
+                    <li><a href="/docs" style="color: #d1d5db; text-decoration: none;">📚 التوثيق</a></li>
+                    <li><a href="/privacy" style="color: #d1d5db; text-decoration: none;">🔒 الخصوصية</a></li>
+                </ul>
+            </div>
+        </div>
+        <div style="text-align: center; padding-top: 20px; border-top: 1px solid #374151; margin-top: 30px;">
+            <p>© 2024 منشئ المواقع بالذكاء الاصطناعي. جميع الحقوق محفوظة.</p>
+        </div>
+    </footer>
+
+    <script src="/js/main.js"></script>
+</body>
+</html>
