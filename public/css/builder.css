@@ -1,0 +1,112 @@
+/* منشئ المواقع */
+.builder-container {
+    display: grid;
+    grid-template-columns: 280px 1fr 280px;
+    gap: 20px;
+    height: calc(100vh - 70px);
+    padding: 20px;
+    background: #f8fafc;
+}
+
+.toolbox {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    overflow-y: auto;
+}
+
+.toolbox-section {
+    margin-bottom: 25px;
+}
+
+.toolbox-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #374151;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.component-item {
+    padding: 12px;
+    margin-bottom: 10px;
+    background: #f9fafb;
+    border: 2px dashed #d1d5db;
+    border-radius: 8px;
+    cursor: move;
+    transition: all 0.2s;
+    text-align: center;
+}
+
+.component-item:hover {
+    background: #e0e7ff;
+    border-color: var(--primary);
+    transform: translateX(-5px);
+}
+
+.canvas-area {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    overflow: hidden;
+    position: relative;
+}
+
+.canvas-toolbar {
+    padding: 15px;
+    background: #f8fafc;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    gap: 10px;
+}
+
+.canvas-content {
+    padding: 30px;
+    min-height: 500px;
+    overflow-y: auto;
+}
+
+.properties-panel {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    overflow-y: auto;
+}
+
+.property-group {
+    margin-bottom: 20px;
+}
+
+.property-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #4b5563;
+}
+
+.property-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+}
+
+.dragging {
+    opacity: 0.5;
+}
+
+.component-placeholder {
+    height: 100px;
+    border: 3px dashed #9ca3af;
+    border-radius: 8px;
+    margin: 10px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6b7280;
+    background: #f9fafb;
+}
