@@ -6,13 +6,11 @@
     <title><%= title %> | منشئ المواقع</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap');
-        body { font-family: 'Cairo', sans-serif; }
-    </style>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
 </head>
 <body class="bg-gray-50">
-    <!-- شريط التنقل -->
+    <!-- Navigation -->
     <nav class="bg-white shadow-lg">
         <div class="max-w-7xl mx-auto px-4">
             <div class="flex justify-between items-center h-16">
@@ -20,60 +18,124 @@
                     <a href="/" class="text-xl font-bold text-blue-600">
                         <i class="fas fa-globe"></i> منشئ المواقع
                     </a>
-                    <a href="/dashboard" class="text-gray-700 hover:text-blue-600">
-                        <i class="fas fa-tachometer-alt"></i> لوحة التحكم
-                    </a>
-                    <a href="/builder" class="text-gray-700 hover:text-blue-600">
-                        <i class="fas fa-paint-brush"></i> منشئ المواقع
-                    </a>
-                    <a href="/ai/create" class="text-gray-700 hover:text-blue-600">
-                        <i class="fas fa-robot"></i> الذكاء الاصطناعي
-                    </a>
-                </div>
-                <div class="flex items-center space-x-4 rtl:space-x-reverse">
                     <% if (user) { %>
-                        <span class="text-gray-700">مرحباً، <%= user.name %></span>
-                        <img src="https://ui-avatars.com/api/?name=<%= user.name %>&background=3B82F6&color=fff" 
-                             class="w-8 h-8 rounded-full" 
-                             alt="صورة المستخدم">
-                        <a href="/logout" class="text-red-500 hover:text-red-700">
-                            <i class="fas fa-sign-out-alt"></i>
+                        <a href="/dashboard" class="nav-link <%= title.includes('لوحة') ? 'active' : '' %>">
+                            <i class="fas fa-tachometer-alt"></i> لوحة التحكم
+                        </a>
+                        <a href="/builder" class="nav-link <%= title.includes('منشئ') ? 'active' : '' %>">
+                            <i class="fas fa-paint-brush"></i> منشئ المواقع
+                        </a>
+                        <a href="/ai" class="nav-link <%= title.includes('ذكاء') ? 'active' : '' %>">
+                            <i class="fas fa-robot"></i> الذكاء الاصطناعي
+                        </a>
+                        <a href="/templates" class="nav-link <%= title.includes('قالب') ? 'active' : '' %>">
+                            <i class="fas fa-th-large"></i> القوالب
                         </a>
                     <% } else { %>
-                        <a href="/login" class="text-blue-600 hover:text-blue-800">تسجيل الدخول</a>
-                        <a href="/register" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-                            إنشاء حساب
+                        <a href="/" class="nav-link <%= title.includes('رئيس') ? 'active' : '' %>">
+                            <i class="fas fa-home"></i> الرئيسية
                         </a>
+                        <a href="/templates" class="nav-link">
+                            <i class="fas fa-th-large"></i> القوالب
+                        </a>
+                        <a href="#features" class="nav-link">
+                            <i class="fas fa-star"></i> المميزات
+                        </a>
+                    <% } %>
+                </div>
+                
+                <div class="flex items-center space-x-4 rtl:space-x-reverse">
+                    <% if (user) { %>
+                        <div class="flex items-center space-x-3 rtl:space-x-reverse">
+                            <img src="https://ui-avatars.com/api/?name=<%= user.name %>&background=3B82F6&color=fff" 
+                                 alt="<%= user.name %>" 
+                                 class="w-8 h-8 rounded-full border-2 border-blue-500">
+                            <span class="text-gray-700 hidden md:inline"><%= user.name %></span>
+                            <a href="/dashboard" class="px-4 py-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200">
+                                <i class="fas fa-tachometer-alt"></i>
+                            </a>
+                            <a href="/logout" class="px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </a>
+                        </div>
+                    <% } else { %>
+                        <div class="flex items-center space-x-3 rtl:space-x-reverse">
+                            <a href="/login" class="px-4 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50">
+                                <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
+                            </a>
+                            <a href="/register" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                <i class="fas fa-user-plus"></i> إنشاء حساب
+                            </a>
+                        </div>
                     <% } %>
                 </div>
             </div>
         </div>
     </nav>
 
-    <!-- المحتوى الرئيسي -->
-    <main class="max-w-7xl mx-auto px-4 py-8">
+    <!-- Main Content -->
+    <main>
         <%- body %>
     </main>
 
-    <!-- التذييل -->
-    <footer class="bg-gray-800 text-white py-8">
-        <div class="max-w-7xl mx-auto px-4 text-center">
-            <p>© 2024 منشئ المواقع بالذكاء الاصطناعي. جميع الحقوق محفوظة.</p>
-            <div class="mt-4 space-x-4">
-                <a href="#" class="hover:text-blue-400"><i class="fab fa-twitter"></i></a>
-                <a href="#" class="hover:text-blue-400"><i class="fab fa-facebook"></i></a>
-                <a href="#" class="hover:text-blue-400"><i class="fab fa-github"></i></a>
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8 mt-12">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">
+                        <i class="fas fa-globe"></i> منشئ المواقع
+                    </h3>
+                    <p class="text-gray-300">
+                        منصة متكاملة لإنشاء مواقع الويب باستخدام الذكاء الاصطناعي مع نشر فوري على Vercel
+                    </p>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold mb-4">روابط سريعة</h4>
+                    <ul class="space-y-2">
+                        <li><a href="/" class="text-gray-300 hover:text-white">الرئيسية</a></li>
+                        <li><a href="/builder" class="text-gray-300 hover:text-white">منشئ المواقع</a></li>
+                        <li><a href="/templates" class="text-gray-300 hover:text-white">القوالب</a></li>
+                        <li><a href="/ai" class="text-gray-300 hover:text-white">الذكاء الاصطناعي</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold mb-4">المميزات</h4>
+                    <ul class="space-y-2">
+                        <li class="text-gray-300">🤖 الذكاء الاصطناعي</li>
+                        <li class="text-gray-300">🎨 السحب والإفلات</li>
+                        <li class="text-gray-300">🚀 نشر فوري</li>
+                        <li class="text-gray-300">📱 تصميم متجاوب</li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold mb-4">التواصل</h4>
+                    <p class="text-gray-300 mb-4">
+                        support@website-builder.com
+                    </p>
+                    <div class="flex space-x-4 rtl:space-x-reverse">
+                        <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-facebook"></i></a>
+                        <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+                <p>© 2024 منشئ المواقع بالذكاء الاصطناعي. جميع الحقوق محفوظة.</p>
             </div>
         </div>
     </footer>
 
-    <script>
-        // التحقق من حالة الموقع
-        fetch('/api/health')
-            .then(res => res.json())
-            .then(data => {
-                console.log('✅ حالة الموقع:', data);
-            });
-    </script>
+    <!-- Scripts -->
+    <script src="/js/main.js"></script>
+    <% if (typeof scripts !== 'undefined') { %>
+        <% scripts.forEach(script => { %>
+            <script src="<%= script %>"></script>
+        <% }) %>
+    <% } %>
 </body>
 </html>
