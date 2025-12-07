@@ -109,3 +109,475 @@
         }
         .auth-button {
             width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #10B981 0%, #3B82F6 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .auth-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);
+        }
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            margin: 25px 0;
+            color: #9ca3af;
+        }
+        .auth-divider::before,
+        .auth-divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: #e5e7eb;
+        }
+        .auth-divider span {
+            padding: 0 15px;
+            background: white;
+        }
+        .social-login {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .social-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 14px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        .social-btn:hover {
+            background: #f9fafb;
+            transform: translateY(-2px);
+        }
+        .auth-footer {
+            text-align: center;
+            margin-top: 25px;
+            color: #6b7280;
+        }
+        .auth-link {
+            color: #10B981;
+            text-decoration: none;
+            font-weight: 600;
+            margin-right: 5px;
+        }
+        .auth-link:hover {
+            text-decoration: underline;
+        }
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+        .password-toggle {
+            position: relative;
+        }
+        .password-toggle i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #6b7280;
+        }
+        .validation-error {
+            color: #ef4444;
+            font-size: 0.85rem;
+            margin-top: 5px;
+            display: none;
+        }
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+        .step {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            color: #9ca3af;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+        .step.active {
+            background: #10B981;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <!-- مؤشر الخطوات -->
+            <div class="step-indicator">
+                <div class="step active">1</div>
+                <div class="step">2</div>
+                <div class="step">3</div>
+            </div>
+
+            <!-- الشعار -->
+            <div class="auth-logo">
+                <i class="fas fa-user-plus"></i>
+                <h1 class="auth-title">أنشئ حسابك المجاني</h1>
+                <p class="auth-subtitle">ابدأ رحلتك في إنشاء مواقع ويب احترافية</p>
+            </div>
+
+            <!-- التنبيهات -->
+            <div class="alert alert-success" id="success-alert" style="display: none;">
+                <i class="fas fa-check-circle"></i>
+                <span id="success-message"></span>
+            </div>
+
+            <div class="alert alert-error" id="error-alert" style="display: none;">
+                <i class="fas fa-exclamation-circle"></i>
+                <span id="error-message"></span>
+            </div>
+
+            <!-- النموذج -->
+            <form class="auth-form" id="register-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">الاسم الأول</label>
+                        <input type="text" class="form-input" id="first-name" 
+                               placeholder="محمد" required>
+                        <div class="validation-error" id="first-name-error"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">اسم العائلة</label>
+                        <input type="text" class="form-input" id="last-name" 
+                               placeholder="أحمد" required>
+                        <div class="validation-error" id="last-name-error"></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">اسم المستخدم</label>
+                    <input type="text" class="form-input" id="username" 
+                           placeholder="mohammed_ahmed" required>
+                    <div class="validation-error" id="username-error"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">البريد الإلكتروني</label>
+                    <input type="email" class="form-input" id="email" 
+                           placeholder="example@email.com" required>
+                    <div class="validation-error" id="email-error"></div>
+                </div>
+
+                <div class="form-group password-toggle">
+                    <label class="form-label">كلمة المرور</label>
+                    <input type="password" class="form-input" id="password" 
+                           placeholder="أدخل كلمة مرور قوية" required
+                           oninput="checkPasswordStrength(this.value)">
+                    <i class="fas fa-eye" id="toggle-password"></i>
+                    <div class="password-strength">
+                        <div class="strength-bar" id="strength-bar"></div>
+                    </div>
+                    <div class="strength-text" id="strength-text">قوة كلمة المرور</div>
+                    <div class="validation-error" id="password-error"></div>
+                </div>
+
+                <div class="form-group password-toggle">
+                    <label class="form-label">تأكيد كلمة المرور</label>
+                    <input type="password" class="form-input" id="confirm-password" 
+                           placeholder="أعد إدخال كلمة المرور" required>
+                    <i class="fas fa-eye" id="toggle-confirm-password"></i>
+                    <div class="validation-error" id="confirm-password-error"></div>
+                </div>
+
+                <div class="terms-agreement">
+                    <input type="checkbox" id="terms" required>
+                    <label for="terms">
+                        أوافق على 
+                        <a href="/terms" target="_blank">شروط الخدمة</a> 
+                        و 
+                        <a href="/privacy" target="_blank">سياسة الخصوصية</a>
+                    </label>
+                </div>
+
+                <button type="submit" class="auth-button" id="register-btn">
+                    <i class="fas fa-user-plus"></i>
+                    إنشاء حساب
+                </button>
+            </form>
+
+            <!-- تسجيل الدخول عبر وسائل التواصل -->
+            <div class="auth-divider">
+                <span>أو سجل الدخول باستخدام</span>
+            </div>
+
+            <div class="social-login">
+                <button class="social-btn google-btn" onclick="registerWithGoogle()">
+                    <i class="fab fa-google"></i>
+                    Google
+                </button>
+                <button class="social-btn github-btn" onclick="registerWithGithub()">
+                    <i class="fab fa-github"></i>
+                    GitHub
+                </button>
+            </div>
+
+            <!-- روابط -->
+            <div class="auth-footer">
+                <p>لديك حساب بالفعل؟ 
+                    <a href="/login" class="auth-link">سجل الدخول</a>
+                </p>
+                <p style="margin-top: 15px;">
+                    <a href="/" class="auth-link">
+                        <i class="fas fa-arrow-right"></i>
+                        العودة للصفحة الرئيسية
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // التحقق من قوة كلمة المرور
+        function checkPasswordStrength(password) {
+            const strengthBar = document.getElementById('strength-bar');
+            const strengthText = document.getElementById('strength-text');
+            
+            let strength = 0;
+            let color = '#ef4444';
+            let text = 'ضعيفة';
+            
+            if (password.length >= 8) strength++;
+            if (/[A-Z]/.test(password)) strength++;
+            if (/[a-z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[^A-Za-z0-9]/.test(password)) strength++;
+            
+            switch(strength) {
+                case 0:
+                case 1:
+                    color = '#ef4444';
+                    text = 'ضعيفة جداً';
+                    break;
+                case 2:
+                    color = '#f59e0b';
+                    text = 'ضعيفة';
+                    break;
+                case 3:
+                    color = '#f59e0b';
+                    text = 'متوسطة';
+                    break;
+                case 4:
+                    color = '#10b981';
+                    text = 'قوية';
+                    break;
+                case 5:
+                    color = '#10b981';
+                    text = 'قوية جداً';
+                    break;
+            }
+            
+            strengthBar.style.width = (strength * 20) + '%';
+            strengthBar.style.background = color;
+            strengthText.textContent = 'قوة كلمة المرور: ' + text;
+            strengthText.style.color = color;
+        }
+
+        // إظهار/إخفاء كلمة المرور
+        document.getElementById('toggle-password').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
+
+        document.getElementById('toggle-confirm-password').addEventListener('click', function() {
+            const passwordInput = document.getElementById('confirm-password');
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
+
+        // التحقق من صحة المدخلات
+        function validateForm() {
+            let isValid = true;
+            
+            // مسح أخطاء سابقة
+            document.querySelectorAll('.validation-error').forEach(el => {
+                el.style.display = 'none';
+            });
+            
+            // التحقق من الاسم الأول
+            const firstName = document.getElementById('first-name').value.trim();
+            if (firstName.length < 2) {
+                document.getElementById('first-name-error').textContent = 'الاسم الأول يجب أن يكون على الأقل حرفين';
+                document.getElementById('first-name-error').style.display = 'block';
+                isValid = false;
+            }
+            
+            // التحقق من اسم العائلة
+            const lastName = document.getElementById('last-name').value.trim();
+            if (lastName.length < 2) {
+                document.getElementById('last-name-error').textContent = 'اسم العائلة يجب أن يكون على الأقل حرفين';
+                document.getElementById('last-name-error').style.display = 'block';
+                isValid = false;
+            }
+            
+            // التحقق من اسم المستخدم
+            const username = document.getElementById('username').value.trim();
+            if (username.length < 3) {
+                document.getElementById('username-error').textContent = 'اسم المستخدم يجب أن يكون على الأقل 3 أحرف';
+                document.getElementById('username-error').style.display = 'block';
+                isValid = false;
+            }
+            
+            // التحقق من البريد الإلكتروني
+            const email = document.getElementById('email').value.trim();
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                document.getElementById('email-error').textContent = 'البريد الإلكتروني غير صالح';
+                document.getElementById('email-error').style.display = 'block';
+                isValid = false;
+            }
+            
+            // التحقق من كلمة المرور
+            const password = document.getElementById('password').value;
+            if (password.length < 8) {
+                document.getElementById('password-error').textContent = 'كلمة المرور يجب أن تكون على الأقل 8 أحرف';
+                document.getElementById('password-error').style.display = 'block';
+                isValid = false;
+            }
+            
+            // التحقق من تطابق كلمة المرور
+            const confirmPassword = document.getElementById('confirm-password').value;
+            if (password !== confirmPassword) {
+                document.getElementById('confirm-password-error').textContent = 'كلمة المرور غير متطابقة';
+                document.getElementById('confirm-password-error').style.display = 'block';
+                isValid = false;
+            }
+            
+            return isValid;
+        }
+
+        // إنشاء الحساب
+        document.getElementById('register-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!validateForm()) {
+                return;
+            }
+            
+            const registerBtn = document.getElementById('register-btn');
+            const successAlert = document.getElementById('success-alert');
+            const errorAlert = document.getElementById('error-alert');
+            const successMessage = document.getElementById('success-message');
+            const errorMessage = document.getElementById('error-message');
+            
+            // إظهار التحميل
+            registerBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري إنشاء الحساب...';
+            registerBtn.disabled = true;
+            
+            try {
+                // محاكاة إنشاء الحساب (في الإصدار الحقيقي، ستستخدم API)
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                // إخفاء تنبيه الخطأ
+                errorAlert.style.display = 'none';
+                
+                // إظهار تنبيه النجاح
+                successMessage.textContent = 'تم إنشاء حسابك بنجاح! جاري توجيهك إلى لوحة التحكم...';
+                successAlert.style.display = 'block';
+                
+                // حفظ بيانات المستخدم
+                const userData = {
+                    firstName: document.getElementById('first-name').value.trim(),
+                    lastName: document.getElementById('last-name').value.trim(),
+                    username: document.getElementById('username').value.trim(),
+                    email: document.getElementById('email').value.trim()
+                };
+                
+                localStorage.setItem('userData', JSON.stringify(userData));
+                localStorage.setItem('userLoggedIn', 'true');
+                
+                // توجيه إلى لوحة التحكم بعد 2 ثانية
+                setTimeout(() => {
+                    window.location.href = '/dashboard';
+                }, 2000);
+                
+            } catch (error) {
+                // إظهار الخطأ
+                errorMessage.textContent = error.message || 'حدث خطأ أثناء إنشاء الحساب';
+                errorAlert.style.display = 'block';
+                
+                // إعادة تعيين الزر
+                registerBtn.innerHTML = '<i class="fas fa-user-plus"></i> إنشاء حساب';
+                registerBtn.disabled = false;
+            }
+        });
+
+        // إنشاء حساب بـ Google
+        function registerWithGoogle() {
+            const infoAlert = document.getElementById('success-alert');
+            infoAlert.innerHTML = '<i class="fas fa-info-circle"></i> جاري التوجيه إلى Google...';
+            infoAlert.style.display = 'block';
+            
+            // محاكاة إنشاء حساب بـ Google
+            setTimeout(() => {
+                localStorage.setItem('userLoggedIn', 'true');
+                localStorage.setItem('userEmail', 'google-user@example.com');
+                window.location.href = '/dashboard';
+            }, 1000);
+        }
+
+        // إنشاء حساب بـ GitHub
+        function registerWithGithub() {
+            const infoAlert = document.getElementById('success-alert');
+            infoAlert.innerHTML = '<i class="fas fa-info-circle"></i> جاري التوجيه إلى GitHub...';
+            infoAlert.style.display = 'block';
+            
+            // محاكاة إنشاء حساب بـ GitHub
+            setTimeout(() => {
+                localStorage.setItem('userLoggedIn', 'true');
+                localStorage.setItem('userEmail', 'github-user@example.com');
+                window.location.href = '/dashboard';
+            }, 1000);
+        }
+
+        // التحقق من تسجيل الدخول السابق
+        document.addEventListener('DOMContentLoaded', function() {
+            if (localStorage.getItem('userLoggedIn') === 'true') {
+                window.location.href = '/dashboard';
+            }
+        });
+    </script>
+</body>
+</html>
