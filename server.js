@@ -1,444 +1,383 @@
 require('dotenv').config();
 const express = require('express');
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
+const path = require('path');
+const session = require('express-session');
+const MongoStore = require('connect-mongo');
+const cors = require('cors');
+const helmet = require('helmet');
+const compression = require('compression');
+const rateLimit = require('express-rate-limit');
+
 const app = express();
 
-// إعدادات أساسية
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// ===== Middleware =====
+app.use(helmet());
+app.use(cors({
+    origin: process.env.CLIENT_URL || 'http://localhost:3000',
+    credentials: true
+}));
+app.use(compression());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// الصفحة الرئيسية
+// Rate limiting
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100
+});
+app.use('/api/', limiter);
+
+// Sessions
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'your-secret-key',
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({
+        mongoUrl: process.env.MONGODB_URI,
+        collectionName: 'sessions'
+    }),
+    cookie: {
+        maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
+        secure: process.env.NODE_ENV === 'production'
+    }
+}));
+
+// Static files
+app.use(express.static(path.join(__dirname, 'public')));
+
+// View engine
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
+// Database connection
+mongoose.connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+})
+.then(() => console.log('✅ MongoDB connected'))
+.catch(err => console.error('❌ MongoDB connection error:', err));
+
+// Models
+const User = require('./models/User');
+const Site = require('./models/Site');
+const Template = require('./models/Template');
+
+// ===== Routes =====
+
+// Home page
 app.get('/', (req, res) => {
-    res.send(`
-        <!DOCTYPE html>
-        <html lang="ar" dir="rtl">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>🚀 منشئ المواقع - يعمل بنجاح!</title>
-            <style>
-                body {
-                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                    text-align: center;
-                    padding: 50px;
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                    color: white;
-                }
-                .container {
-                    max-width: 800px;
-                    margin: 0 auto;
-                    background: rgba(255,255,255,0.1);
-                    padding: 40px;
-                    border-radius: 20px;
-                    backdrop-filter: blur(10px);
-                }
-                h1 {
-                    font-size: 3rem;
-                    margin-bottom: 20px;
-                }
-                .status {
-                    display: inline-block;
-                    padding: 10px 20px;
-                    background: #10B981;
-                    border-radius: 20px;
-                    font-weight: bold;
-                    margin: 20px 0;
-                }
-                .links {
-                    display: flex;
-                    flex-wrap: wrap;
-                    gap: 15px;
-                    justify-content: center;
-                    margin: 30px 0;
-                }
-                .btn {
-                    padding: 15px 30px;
-                    background: white;
-                    color: #667eea;
-                    text-decoration: none;
-                    border-radius: 10px;
-                    font-weight: bold;
-                    transition: all 0.3s;
-                }
-                .btn:hover {
-                    transform: translateY(-3px);
-                    box-shadow: 0 10px 25px rgba(255,255,255,0.3);
-                }
-                .info {
-                    background: rgba(255,255,255,0.1);
-                    padding: 20px;
-                    border-radius: 10px;
-                    margin: 20px 0;
-                    text-align: right;
-                }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <h1>🎉 منشئ المواقع يعمل بنجاح!</h1>
-                <div class="status">✅ Server is running on Vercel</div>
-                
-                <div class="info">
-                    <h3>📊 معلومات النظام:</h3>
-                    <p><strong>البيئة:</strong> ${process.env.NODE_ENV || 'production'}</p>
-                    <p><strong>المنصة:</strong> Vercel Serverless Functions</p>
-                    <p><strong>الوقت:</strong> ${new Date().toLocaleString('ar-SA')}</p>
-                </div>
-                
-                <div class="links">
-                    <a href="/builder" class="btn">🎨 منشئ المواقع</a>
-                    <a href="/health" class="btn">📊 حالة النظام</a>
-                    <a href="/test" class="btn">🧪 صفحة تجريبية</a>
-                </div>
-                
-                <p style="margin-top: 30px; opacity: 0.9;">
-                    تم النشر بنجاح على Vercel | جميع المميزات تعمل الآن
-                </p>
-            </div>
-        </body>
-        </html>
-    `);
+    res.render('index', {
+        title: '🚀 منشئ المواقع بالذكاء الاصطناعي',
+        user: req.session.user,
+        features: [
+            { icon: '🤖', title: 'الذكاء الاصطناعي', desc: 'إنشاء مواقع كاملة باستخدام Gemini AI' },
+            { icon: '🎨', title: 'السحب والإفلات', desc: 'صمم موقعك بسهولة بدون كتابة كود' },
+            { icon: '🚀', title: 'النشر الفوري', desc: 'انشر موقعك على Vercel بنقرة واحدة' },
+            { icon: '📱', title: 'تصميم متجاوب', desc: 'يعمل على جميع الأجهزة والهواتف' }
+        ]
+    });
 });
 
-// صفحة البناء (مبسطة)
+// Dashboard
+app.get('/dashboard', async (req, res) => {
+    if (!req.session.user) {
+        return res.redirect('/login');
+    }
+
+    try {
+        const sites = await Site.find({ user: req.session.user.id });
+        const stats = {
+            totalSites: sites.length,
+            publishedSites: sites.filter(s => s.status === 'published').length,
+            totalViews: sites.reduce((sum, site) => sum + (site.views || 0), 0)
+        };
+
+        res.render('dashboard', {
+            title: '📊 لوحة التحكم',
+            user: req.session.user,
+            sites: sites.slice(0, 5),
+            stats: stats
+        });
+    } catch (error) {
+        res.render('dashboard', {
+            title: '📊 لوحة التحكم',
+            user: req.session.user,
+            sites: [],
+            stats: { totalSites: 0, publishedSites: 0, totalViews: 0 }
+        });
+    }
+});
+
+// Builder
 app.get('/builder', (req, res) => {
-    res.send(`
-        <!DOCTYPE html>
-        <html lang="ar" dir="rtl">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>🎨 منشئ المواقع - السحب والإفلات</title>
-            <style>
-                body {
-                    margin: 0;
-                    padding: 0;
-                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                    background: #f5f7fa;
-                }
-                
-                .navbar {
-                    background: white;
-                    padding: 15px 30px;
-                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                }
-                
-                .logo {
-                    font-size: 1.5rem;
-                    font-weight: bold;
-                    color: #3B82F6;
-                    text-decoration: none;
-                }
-                
-                .builder-container {
-                    display: flex;
-                    height: calc(100vh - 70px);
-                }
-                
-                .toolbox {
-                    width: 250px;
-                    background: white;
-                    padding: 20px;
-                    border-right: 1px solid #e5e7eb;
-                }
-                
-                .component-item {
-                    background: #f9fafb;
-                    border: 2px dashed #d1d5db;
-                    border-radius: 8px;
-                    padding: 15px;
-                    margin-bottom: 10px;
-                    text-align: center;
-                    cursor: pointer;
-                    transition: all 0.2s;
-                }
-                
-                .component-item:hover {
-                    background: #e0e7ff;
-                    border-color: #3B82F6;
-                }
-                
-                .canvas {
-                    flex: 1;
-                    padding: 30px;
-                    background: #f8fafc;
-                    overflow: auto;
-                }
-                
-                .drop-area {
-                    background: white;
-                    min-height: 400px;
-                    border-radius: 12px;
-                    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-                    padding: 30px;
-                    text-align: center;
-                    color: #6b7280;
-                    border: 3px dashed #d1d5db;
-                }
-                
-                .btn {
-                    padding: 12px 24px;
-                    background: #3B82F6;
-                    color: white;
-                    border: none;
-                    border-radius: 8px;
-                    font-weight: bold;
-                    cursor: pointer;
-                    margin: 5px;
-                }
-                
-                .btn-success {
-                    background: #10B981;
-                }
-                
-                .action-buttons {
-                    display: flex;
-                    gap: 10px;
-                    margin-top: 20px;
-                    justify-content: center;
-                }
-            </style>
-        </head>
-        <body>
-            <nav class="navbar">
-                <a href="/" class="logo">🎨 منشئ المواقع</a>
-                <div>
-                    <input type="text" value="مشروعي" style="padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px;">
-                </div>
-            </nav>
-            
-            <div class="builder-container">
-                <div class="toolbox">
-                    <h3>📦 المكونات</h3>
-                    <div class="component-item" onclick="addComponent('hero')">
-                        ⭐ قسم البطل
-                    </div>
-                    <div class="component-item" onclick="addComponent('features')">
-                        🔧 المميزات
-                    </div>
-                    <div class="component-item" onclick="addComponent('contact')">
-                        📞 اتصل بنا
-                    </div>
-                    
-                    <div style="margin-top: 30px;">
-                        <button class="btn" onclick="generateWithAI()">
-                            🤖 مساعد الذكاء
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="canvas">
-                    <div class="drop-area" id="canvas">
-                        <h3>ابدأ ببناء موقعك</h3>
-                        <p>انقر على المكونات لإضافتها هنا</p>
-                        
-                        <div id="components-container"></div>
-                        
-                        <div class="action-buttons">
-                            <button class="btn" onclick="saveProject()">💾 حفظ</button>
-                            <button class="btn btn-success" onclick="previewProject()">👁️ معاينة</button>
-                            <button class="btn" onclick="publishProject()" style="background: #8B5CF6;">🚀 نشر</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <script>
-                let components = [];
-                
-                function addComponent(type) {
-                    const container = document.getElementById('components-container');
-                    const component = document.createElement('div');
-                    component.className = 'component-item';
-                    component.style.background = 'white';
-                    component.style.border = '2px solid #3B82F6';
-                    component.style.padding = '20px';
-                    component.style.margin = '10px 0';
-                    component.style.borderRadius = '8px';
-                    
-                    if (type === 'hero') {
-                        component.innerHTML = \`
-                            <h3 style="color: #3B82F6;">⭐ قسم البطل</h3>
-                            <p>عنوان رئيسي جذاب مع زر للدعوة للعمل</p>
-                            <button onclick="this.parentElement.remove()" style="background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px; margin-top: 10px;">حذف</button>
-                        \`;
-                    } else if (type === 'features') {
-                        component.innerHTML = \`
-                            <h3 style="color: #10B981;">🔧 قسم المميزات</h3>
-                            <p>عرض مميزات المنتج أو الخدمة</p>
-                            <button onclick="this.parentElement.remove()" style="background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px; margin-top: 10px;">حذف</button>
-                        \`;
-                    }
-                    
-                    container.appendChild(component);
-                    components.push({ type: type, id: Date.now() });
-                }
-                
-                function generateWithAI() {
-                    const prompt = prompt('ماذا تريد أن تنشئ بالذكاء الاصطناعي؟');
-                    if (prompt) {
-                        alert('جاري إنشاء المحتوى...');
-                        addComponent('hero');
-                        addComponent('features');
-                    }
-                }
-                
-                function saveProject() {
-                    localStorage.setItem('project', JSON.stringify(components));
-                    alert('تم حفظ المشروع بنجاح!');
-                }
-                
-                function previewProject() {
-                    if (components.length === 0) {
-                        alert('أضف بعض المكونات أولاً');
-                        return;
-                    }
-                    alert('المعاينة جاهزة!');
-                }
-                
-                function publishProject() {
-                    if (components.length === 0) {
-                        alert('أضف بعض المكونات أولاً');
-                        return;
-                    }
-                    
-                    fetch('/api/publish', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ components: components })
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.success) {
-                            alert(\`✅ تم النشر بنجاح!\\n🔗 \${data.url}\`);
-                        } else {
-                            alert('❌ فشل النشر: ' + data.message);
-                        }
-                    })
-                    .catch(err => {
-                        alert('❌ خطأ: ' + err.message);
-                    });
-                }
-                
-                // تحميل المشروع المحفوظ
-                document.addEventListener('DOMContentLoaded', () => {
-                    const saved = localStorage.getItem('project');
-                    if (saved) {
-                        components = JSON.parse(saved);
-                        components.forEach(comp => addComponent(comp.type));
-                    }
-                });
-            </script>
-        </body>
-        </html>
-    `);
+    if (!req.session.user) {
+        return res.redirect('/login');
+    }
+
+    res.render('builder', {
+        title: '🎨 منشئ المواقع',
+        user: req.session.user,
+        projectId: req.query.project || 'new'
+    });
 });
 
-// صفحة التحقق من الصحة
-app.get('/health', (req, res) => {
+// AI Generator
+app.get('/ai', (req, res) => {
+    if (!req.session.user) {
+        return res.redirect('/login');
+    }
+
+    res.render('ai', {
+        title: '🤖 إنشاء بالذكاء الاصطناعي',
+        user: req.session.user
+    });
+});
+
+// Templates
+app.get('/templates', async (req, res) => {
+    try {
+        const templates = await Template.find({ isPublic: true });
+        res.render('templates', {
+            title: '📁 القوالب الجاهزة',
+            user: req.session.user,
+            templates: templates
+        });
+    } catch (error) {
+        res.render('templates', {
+            title: '📁 القوالب الجاهزة',
+            user: req.session.user,
+            templates: []
+        });
+    }
+});
+
+// Login
+app.get('/login', (req, res) => {
+    if (req.session.user) {
+        return res.redirect('/dashboard');
+    }
+    res.render('login', { title: '🔐 تسجيل الدخول', user: null });
+});
+
+// Register
+app.get('/register', (req, res) => {
+    if (req.session.user) {
+        return res.redirect('/dashboard');
+    }
+    res.render('register', { title: '📝 إنشاء حساب', user: null });
+});
+
+// Logout
+app.get('/logout', (req, res) => {
+    req.session.destroy();
+    res.redirect('/');
+});
+
+// ===== API Routes =====
+
+// Health check
+app.get('/api/health', (req, res) => {
     res.json({
         status: 'healthy',
         timestamp: new Date().toISOString(),
-        environment: process.env.NODE_ENV || 'production',
-        node_version: process.version,
-        platform: 'Vercel Serverless',
-        endpoints: {
-            '/': 'الرئيسية',
-            '/builder': 'منشئ المواقع',
-            '/health': 'حالة النظام',
-            '/test': 'صفحة تجريبية',
-            '/api/*': 'واجهة برمجة التطبيقات'
-        },
+        environment: process.env.NODE_ENV,
         services: {
-            mongodb: process.env.MONGODB_URI ? 'configured' : 'not-configured',
-            gemini: process.env.GEMINI_API_KEY ? 'configured' : 'not-configured',
+            mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+            gemini: process.env.GEMINI_API_KEY ? 'available' : 'unavailable',
             vercel: process.env.VERCEL_TOKEN ? 'configured' : 'not-configured'
         }
     });
 });
 
-// صفحة تجريبية
-app.get('/test', (req, res) => {
-    res.send(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>✅ صفحة تجريبية</title>
-            <style>
-                body { font-family: Arial; padding: 30px; text-align: center; }
-                .success { color: #10B981; font-size: 2rem; }
-                .box { background: #f8fafc; padding: 20px; border-radius: 10px; margin: 20px; }
-            </style>
-        </head>
-        <body>
-            <h1 class="success">✅ كل شيء يعمل بشكل صحيح!</h1>
-            <div class="box">
-                <h3>المسارات المتاحة:</h3>
-                <ul style="list-style: none; padding: 0;">
-                    <li><a href="/">🏠 الرئيسية</a></li>
-                    <li><a href="/builder">🎨 منشئ المواقع</a></li>
-                    <li><a href="/health">📊 حالة النظام</a></li>
-                </ul>
-            </div>
-        </body>
-        </html>
-    `);
-});
-
-// API للنشر
-app.post('/api/publish', (req, res) => {
+// Auth API
+app.post('/api/auth/login', async (req, res) => {
     try {
-        res.json({
-            success: true,
-            message: 'تم النشر بنجاح على Vercel',
-            url: 'https://your-site.vercel.app',
-            timestamp: new Date().toISOString()
+        const { email, password } = req.body;
+        
+        // Demo user (in production, check database)
+        if (email === 'demo@example.com' && password === 'demo123') {
+            req.session.user = {
+                id: 'demo-user-123',
+                name: 'مستخدم تجريبي',
+                email: 'demo@example.com',
+                role: 'user'
+            };
+            
+            return res.json({
+                success: true,
+                message: 'تم تسجيل الدخول بنجاح',
+                user: req.session.user
+            });
+        }
+        
+        res.status(401).json({
+            success: false,
+            message: 'البريد الإلكتروني أو كلمة المرور غير صحيحة'
         });
     } catch (error) {
         res.status(500).json({
             success: false,
-            message: error.message
+            message: 'حدث خطأ في تسجيل الدخول'
         });
+    }
+});
+
+// Site API
+app.post('/api/sites/save', async (req, res) => {
+    try {
+        const { name, content, settings } = req.body;
+        
+        const site = new Site({
+            name: name,
+            content: content,
+            settings: settings,
+            user: req.session.user?.id || 'demo-user',
+            status: 'draft',
+            slug: name.toLowerCase().replace(/ /g, '-') + '-' + Date.now()
+        });
+        
+        await site.save();
+        
+        res.json({
+            success: true,
+            message: 'تم حفظ الموقع بنجاح',
+            siteId: site._id
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'حدث خطأ في حفظ الموقع'
+        });
+    }
+});
+
+// AI Generation API
+app.post('/api/ai/generate', async (req, res) => {
+    try {
+        const { prompt, type, style } = req.body;
+        
+        // Initialize Gemini AI
+        const { GoogleGenerativeAI } = require('@google/generative-ai');
+        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+        
+        const aiPrompt = `
+        أنشئ موقع ويب ${type || 'تجاري'} بنمط ${style || 'حديث'} بناءً على الوصف التالي:
+        
+        ${prompt}
+        
+        قدم النتيجة كـ JSON بهذا التنسيق:
+        {
+            "html": "كود HTML كامل مع Tailwind CSS",
+            "css": "كود CSS إضافي إذا لزم",
+            "js": "كود JavaScript للتفاعلية",
+            "title": "عنوان الموقع",
+            "description": "وصف الموقع"
+        }
+        `;
+        
+        const result = await model.generateContent(aiPrompt);
+        const response = await result.response;
+        const text = response.text();
+        
+        // Try to parse JSON from response
+        try {
+            const jsonMatch = text.match(/\{[\s\S]*\}/);
+            const websiteData = jsonMatch ? JSON.parse(jsonMatch[0]) : { html: text };
+            
+            res.json({
+                success: true,
+                data: websiteData
+            });
+        } catch (parseError) {
+            res.json({
+                success: true,
+                data: {
+                    html: text,
+                    css: '',
+                    js: '',
+                    title: 'موقع تم إنشاؤه بالذكاء الاصطناعي',
+                    description: prompt
+                }
+            });
+        }
+    } catch (error) {
+        console.error('AI Generation error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'حدث خطأ في إنشاء الموقع'
+        });
+    }
+});
+
+// Vercel Deployment API
+app.post('/api/vercel/deploy', async (req, res) => {
+    try {
+        const { siteId, projectName } = req.body;
+        
+        // In production, integrate with Vercel API
+        // This is a demo response
+        res.json({
+            success: true,
+            message: 'جاري نشر الموقع على Vercel',
+            deployment: {
+                id: 'dpl_' + Math.random().toString(36).substr(2, 9),
+                url: `https://${projectName || 'my-website'}.vercel.app`,
+                status: 'QUEUED'
+            }
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'حدث خطأ في النشر'
+        });
+    }
+});
+
+// Preview site
+app.get('/preview/:siteId', async (req, res) => {
+    try {
+        const site = await Site.findById(req.params.siteId);
+        if (!site) {
+            return res.status(404).send('الموقع غير موجود');
+        }
+        
+        res.render('preview', {
+            title: site.name,
+            site: site,
+            user: req.session.user
+        });
+    } catch (error) {
+        res.status(500).send('حدث خطأ في تحميل المعاينة');
     }
 });
 
 // 404
 app.use((req, res) => {
-    res.status(404).send(`
-        <!DOCTYPE html>
-        <html>
-        <head><title>404</title></head>
-        <body style="text-align: center; padding: 50px;">
-            <h1>😕 الصفحة غير موجودة</h1>
-            <a href="/">العودة للرئيسية</a>
-        </body>
-        </html>
-    `);
+    res.status(404).render('404', {
+        title: '😕 الصفحة غير موجودة',
+        user: req.session.user
+    });
 });
 
-// معالج الأخطاء
+// Error handler
 app.use((err, req, res, next) => {
-    console.error('❌ خطأ:', err);
-    res.status(500).send(`
-        <!DOCTYPE html>
-        <html>
-        <head><title>خطأ</title></head>
-        <body style="text-align: center; padding: 50px;">
-            <h1>🚨 حدث خطأ</h1>
-            <p>${err.message}</p>
-            <a href="/">العودة للرئيسية</a>
-        </body>
-        </html>
-    `);
+    console.error('❌ Server error:', err);
+    res.status(500).render('error', {
+        title: '🚨 حدث خطأ',
+        message: err.message,
+        user: req.session.user
+    });
 });
 
-// بدء السيرفر
+// Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`🚀 السيرفر يعمل على port ${PORT}`);
+    console.log(`🚀 Server running on http://localhost:${PORT}`);
+    console.log(`📁 Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`🔗 MongoDB: ${process.env.MONGODB_URI ? 'Connected' : 'Not configured'}`);
+    console.log(`🤖 Gemini AI: ${process.env.GEMINI_API_KEY ? 'Available' : 'Not configured'}`);
 });
 
 module.exports = app;
