@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
-const mongoose = require('mongoose');
 const path = require('path');
+
 const app = express();
 
 // إعدادات أساسية
@@ -13,85 +13,107 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// الاتصال بقاعدة البيانات
-async function connectDB() {
-  try {
-    if (process.env.MONGODB_URI) {
-      await mongoose.connect(process.env.MONGODB_URI, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true
-      });
-      console.log('✅ تم الاتصال بـ MongoDB');
-      return true;
-    }
-    return false;
-  } catch (error) {
-    console.error('❌ خطأ في MongoDB:', error.message);
-    return false;
-  }
-}
-
-// الصفحة الرئيسية مع واجهة كاملة
-app.get('/', async (req, res) => {
-  const dbConnected = await connectDB();
-  
-  res.render('index', {
-    title: '🚀 منشئ المواقع بالذكاء الاصطناعي',
-    user: { name: 'مستخدم' },
-    dbConnected,
-    geminiAvailable: !!process.env.GEMINI_API_KEY,
-    appUrl: process.env.APP_URL || 'http://localhost:3000'
-  });
+// صفحة الاختبار
+app.get('/', (req, res) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html lang="ar">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>✅ الموقع يعمل</title>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          text-align: center;
+          padding: 50px;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+        }
+        .container {
+          background: rgba(255,255,255,0.1);
+          padding: 40px;
+          border-radius: 15px;
+          max-width: 600px;
+          margin: 0 auto;
+        }
+        h1 { font-size: 3em; margin-bottom: 20px; }
+        .success { color: #4ade80; font-size: 1.5em; }
+        .info { margin: 20px 0; }
+        .btn {
+          display: inline-block;
+          background: white;
+          color: #667eea;
+          padding: 12px 30px;
+          border-radius: 30px;
+          text-decoration: none;
+          margin: 10px;
+          font-weight: bold;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <h1>🚀 الموقع يعمل بنجاح!</h1>
+        <div class="success">✅ Server is running</div>
+        <div class="info">
+          <p><strong>الخطوة التالية:</strong></p>
+          <p>1. تحقق من أن جميع الملفات موجودة</p>
+          <p>2. تأكد من Environment Variables</p>
+          <p>3. تحقق من Logs في Vercel</p>
+        </div>
+        <div>
+          <a href="/health" class="btn">تحقق من الصحة</a>
+          <a href="/test" class="btn">صفحة تجريبية</a>
+        </div>
+      </div>
+    </body>
+    </html>
+  `);
 });
 
-// صفحة البناء
-app.get('/builder', (req, res) => {
-  res.render('builder', {
-    title: '🏗️ منشئ المواقع',
-    user: { name: 'مستخدم' }
-  });
-});
-
-// صفحة لوحة التحكم
-app.get('/dashboard', (req, res) => {
-  res.render('dashboard', {
-    title: '📊 لوحة التحكم',
-    user: { name: 'مستخدم' }
-  });
-});
-
-// صفحة إنشاء موقع بالذكاء الاصطناعي
-app.get('/ai/create', (req, res) => {
-  res.render('ai-create', {
-    title: '🤖 إنشاء موقع بالذكاء الاصطناعي',
-    user: { name: 'مستخدم' }
-  });
-});
-
-// API للتحقق من الصحة
-app.get('/api/health', async (req, res) => {
-  const dbConnected = await connectDB();
-  
+// صفحة التحقق من الصحة
+app.get('/health', (req, res) => {
   res.json({
-    status: 'running',
-    db: dbConnected ? 'connected' : 'disconnected',
-    gemini: process.env.GEMINI_API_KEY ? 'available' : 'unavailable',
-    time: new Date().toISOString(),
-    node: process.version
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    node: process.version,
+    env: process.env.NODE_ENV || 'development',
+    mongodb: process.env.MONGODB_URI ? '✅ موجود' : '❌ مفقود',
+    gemini: process.env.GEMINI_API_KEY ? '✅ موجود' : '❌ مفقود',
+    port: process.env.PORT || 3000
   });
 });
 
-// معالجة 404
+// صفحة تجريبية
+app.get('/test', (req, res) => {
+  res.render('test', { 
+    title: 'صفحة تجريبية',
+    message: '🎉 تم تحميل EJS بنجاح!'
+  });
+});
+
+// 404
 app.use((req, res) => {
-  res.status(404).render('404', {
-    title: 'الصفحة غير موجودة',
-    user: { name: 'مستخدم' }
-  });
+  res.status(404).send('الصفحة غير موجودة');
 });
 
-// بدء السيرفر
+// معالج الأخطاء
+app.use((err, req, res, next) => {
+  console.error('خطأ:', err);
+  res.status(500).send(`
+    <h1>خطأ في السيرفر</h1>
+    <p><strong>الرسالة:</strong> ${err.message}</p>
+    <p><strong>التفاصيل:</strong> ${err.stack}</p>
+    <a href="/">العودة للصفحة الرئيسية</a>
+  `);
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`🚀 السيرفر يعمل: http://localhost:${PORT}`);
-  console.log(`📁 Views directory: ${path.join(__dirname, 'views')}`);
+  console.log(`✅ السيرفر يعمل على port ${PORT}`);
+  console.log(`🌐 Environment: ${process.env.NODE_ENV}`);
+  console.log(`📁 Views: ${path.join(__dirname, 'views')}`);
 });
+
+module.exports = app;
