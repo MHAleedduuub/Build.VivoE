@@ -3,35 +3,21 @@
   "builds": [
     {
       "src": "server.js",
-      "use": "@vercel/node",
-      "config": {
-        "maxLambdaSize": "15mb"
-      }
+      "use": "@vercel/node"
     }
   ],
   "routes": [
     {
-      "src": "/css/(.*)",
-      "dest": "/server.js"
-    },
-    {
-      "src": "/js/(.*)",
-      "dest": "/server.js"
-    },
-    {
-      "src": "/images/(.*)",
-      "dest": "/server.js"
+      "src": "/builder",
+      "dest": "server.js"
     },
     {
       "src": "/api/(.*)",
-      "dest": "/server.js"
+      "dest": "server.js"
     },
     {
       "src": "/(.*)",
-      "dest": "/server.js"
+      "dest": "server.js"
     }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  }
+  ]
 }
