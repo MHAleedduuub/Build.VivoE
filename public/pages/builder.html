@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎨 منشئ المواقع - تصميم مواقع بالسحب والإفلات</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/builder.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .builder-header {
+            background: white;
+            padding: 15px 30px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .project-info h1 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+            color: #1F2937;
+        }
+        .project-info input {
+            border: none;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1F2937;
+            background: transparent;
+            padding: 5px;
+            border-radius: 5px;
+        }
+        .project-info input:focus {
+            outline: 2px solid #3B82F6;
+            background: white;
+        }
+        .builder-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .component-palette {
+            background: white;
+            height: calc(100vh - 130px);
+            overflow-y: auto;
+            border-right: 1px solid #e5e7eb;
+        }
+        .component-category {
+            padding: 15px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .category-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #4B5563;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .components-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        .component-item {
+            background: #f8fafc;
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            cursor: move;
+            transition: all 0.2s;
+        }
+        .component-item:hover {
+            background: #e0e7ff;
+            border-color: #3B82F6;
+        }
+        .component-icon {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+            color: #6B7280;
+        }
+        .canvas-container {
+            background: #f5f7fa;
+            padding: 20px;
+            overflow: auto;
+            height: calc(100vh - 130px);
+        }
+        .canvas {
+            background: white;
+            min-height: 800px;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            padding: 30px;
+            position: relative;
+        }
+        .droppable-area {
+            min-height: 200px;
+            border: 3px dashed #9ca3af;
+            border-radius: 10px;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+            background: #f9fafb;
+        }
+        .droppable-area.active {
+            border-color: #3B82F6;
+            background: #e0e7ff;
+        }
+        .properties-panel {
+            background: white;
+            height: calc(100vh - 130px);
+            overflow-y: auto;
+            border-left: 1px solid #e5e7eb;
+        }
+        .properties-header {
+            padding: 20px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .property-group {
+            padding: 20px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .property-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #4B5563;
+        }
+        .property-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+        }
+        .selected-element {
+            border: 2px solid #3B82F6 !important;
+            position: relative;
+        }
+        .element-actions {
+            position: absolute;
+            top: -30px;
+            left: 10px;
+            background: #3B82F6;
+            border-radius: 5px;
+            display: flex;
+            gap: 5px;
+            padding: 5px;
+        }
+        .element-btn {
+            background: white;
+            border: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .preview-mode .element-actions {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- شريط التنقل -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">
+                <i class="fas fa-globe"></i>
+                <span>منشئ المواقع</span>
+            </a>
+            
+            <div class="nav-links">
+                <a href="/" class="nav-link"><i class="fas fa-home"></i> الرئيسية</a>
+                <a href="/dashboard" class="nav-link"><i class="fas fa-tachometer-alt"></i> لوحة التحكم</a>
+                <a href="/builder" class="nav-link active"><i class="fas fa-paint-brush"></i> منشئ المواقع</a>
+                <a href="/ai/create" class="nav-link"><i class="fas fa-robot"></i> الذكاء الاصطناعي</a>
+            </div>
+            
+            <div class="user-menu">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="color: #4B5563;">وضع التحرير</span>
+                    <button id="preview-toggle" class="btn btn-outline" style="padding: 8px 15px;">
+                        <i class="fas fa-eye"></i> معاينة
+                    </button>
+                    <a href="/logout" class="btn btn-outline" style="padding: 8px 15px;">
+                        <i class="fas fa-sign-out-alt"></i> خروج
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- رأس البناء -->
+    <div class="builder-header">
+        <div class="project-info">
+            <h1>المشروع: <input type="text" value="موقعي الجديد" id="project-name"></h1>
+            <p style="color: #6B7280; font-size: 0.9rem;">آخر تعديل: منذ 5 دقائق</p>
+        </div>
+        
+        <div class="builder-actions">
+            <button class="btn btn-outline" id="save-btn">
+                <i class="fas fa-save"></i> حفظ
+            </button>
+            <button class="btn btn-primary" id="ai-assist-btn">
+                <i class="fas fa-robot"></i> مساعد الذكاء
+            </button>
+            <button class="btn btn-success" id="publish-btn">
+                <i class="fas fa-rocket"></i> نشر على Vercel
+            </button>
+            <button class="btn btn-danger" id="clear-btn">
+                <i class="fas fa-trash"></i> مسح الكل
+            </button>
+        </div>
+    </div>
+
+    <!-- واجهة البناء -->
+    <div style="display: grid; grid-template-columns: 280px 1fr 280px; height: calc(100vh - 130px);">
+        <!-- شريط المكونات -->
+        <div class="component-palette">
+            <div class="component-category">
+                <div class="category-title">
+                    <i class="fas fa-layer-group"></i> المكونات الأساسية
+                </div>
+                <div class="components-grid">
+                    <div class="component-item" draggable="true" data-type="hero">
+                        <div class="component-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div>قسم البطل</div>
+                    </div>
+                    <div class="component-item" draggable="true" data-type="header">
+                        <div class="component-icon">
+                            <i class="fas fa-heading"></i>
+                        </div>
+                        <div>رأس الموقع</div>
+                    </div>
+                    <div class="component-item" draggable="true" data-type="features">
+                        <div class="component-icon">
+                            <i class="fas fa-th-large"></i>
+                        </div>
+                        <div>قسم المميزات</div>
+                    </div>
+                    <div class="component-item" draggable="true" data-type="about">
+                        <div class="component-icon">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <div>من نحن</div>
+                    </div>
+                    <div class="component-item" draggable="true" data-type="contact">
+                        <div class="component-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div>اتصل بنا</div>
+                    </div>
+                    <div class="component-item" draggable="true" data-type="footer">
+                        <div class="component-icon">
+                            <i class="fas fa-window-minimize"></i>
+                        </div>
+                        <div>تذييل الموقع</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="component-category">
+                <div class="category-title">
+                    <i class="fas fa-images"></i> الوسائط
+                </div>
+                <div class="components-grid">
+                    <div class="component-item" draggable="true" data-type="image">
+                        <div class="component-icon">
+                            <i class="fas fa-image"></i>
+                        </div>
+                        <div>صورة</div>
+                    </div>
+                    <div class="component-item" draggable="true" data-type="gallery">
+                        <div class="component-icon">
+                            <i class="fas fa-photo-video"></i>
+                        </div>
+                        <div>معرض الصور</div>
+                    </div>
+                    <div class="component-item" draggable="true" data-type="video">
+                        <div class="component-icon">
+                            <i class="fas fa-video"></i>
+                        </div>
+                        <div>فيديو</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="component-category">
+                <div class="category-title">
+                    <i class="fas fa-robot"></i> الذكاء الاصطناعي
+                </div>
+                <div style="padding: 10px;">
+                    <button class="btn btn-primary" style="width: 100%; margin-bottom: 10px;" onclick="openAIModal()">
+                        <i class="fas fa-magic"></i> إنشاء بالذكاء
+                    </button>
+                    <button class="btn btn-outline" style="width: 100%;" onclick="optimizeWithAI()">
+                        <i class="fas fa-wand-magic-sparkles"></i> تحسين التصميم
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- منطقة البناء -->
+        <div class="canvas-container">
+            <div class="canvas" id="main-canvas">
+                <div class="droppable-area" id="drop-zone">
+                    <div style="text-align: center; padding: 40px;">
+                        <i class="fas fa-mouse-pointer" style="font-size: 3rem; color: #9ca3af; margin-bottom: 20px;"></i>
+                        <h3 style="color: #6b7280; margin-bottom: 10px;">اسحب المكونات هنا</h3>
+                        <p style="color: #9ca3af;">ابدأ ببناء موقعك عن طريق سحب المكونات من الشريط الأيسر</p>
+                    </div>
+                </div>
+                
+                <!-- المكونات المضافة تظهر هنا -->
+                <div id="components-container"></div>
+            </div>
+        </div>
+
+        <!-- شريط الخصائص -->
+        <div class="properties-panel">
+            <div class="properties-header">
+                <h3 style="margin-bottom: 10px;"><i class="fas fa-sliders-h"></i> الخصائص</h3>
+                <p style="color: #6B7280; font-size: 0.9rem;">اختر عنصراً لتعديل خصائصه</p>
+            </div>
+            
+            <div id="properties-content">
+                <div style="text-align: center; padding: 40px 20px; color: #9CA3AF;">
+                    <i class="fas fa-object-group" style="font-size: 3rem; margin-bottom: 20px;"></i>
+                    <p>اختر عنصراً من منطقة البناء لعرض خصائصه هنا</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة الذكاء الاصطناعي -->
+    <div id="ai-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border-radius: 15px; width: 90%; max-width: 600px; padding: 30px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="font-size: 1.5rem;"><i class="fas fa-robot"></i> مساعد الذكاء الاصطناعي</h2>
+                <button onclick="closeAIModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #6B7280;">&times;</button>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 500;">ما نوع الموقع الذي تريد إنشاءه؟</label>
+                <textarea id="ai-prompt" style="width: 100%; padding: 15px; border: 2px solid #e5e7eb; border-radius: 10px; height: 150px; font-family: inherit;" placeholder="مثال: أريد موقعاً لبيع العطور الفاخرة مع معرض صور وتقييمات العملاء ونظام طلب عبر الإنترنت..."></textarea>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                <div>
+                    <label style="display: block; margin-bottom: 5px; font-weight: 500;">نوع الموقع</label>
+                    <select id="site-type" style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px;">
+                        <option value="business">أعمال</option>
+                        <option value="portfolio">معرض أعمال</option>
+                        <option value="ecommerce">متجر إلكتروني</option>
+                        <option value="blog">مدونة</option>
+                        <option value="landing">صفحة هبوط</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="display: block; margin-bottom: 5px; font-weight: 500;">النمط</label>
+                    <select id="site-style" style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px;">
+                        <option value="modern">حديث</option>
+                        <option value="minimal">بسيط</option>
+                        <option value="elegant">أنيق</option>
+                        <option value="corporate">احترافي</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button id="generate-ai" class="btn btn-primary" style="width: 100%; padding: 15px; font-size: 1.1rem;">
+                <i class="fas fa-magic"></i> أنشئ الموقع بالذكاء الاصطناعي
+            </button>
+            
+            <div id="ai-loading" style="display: none; text-align: center; padding: 20px;">
+                <div style="display: inline-block; width: 40px; height: 40px; border: 3px solid #f3f3f3; border-top: 3px solid #3B82F6; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                <p style="margin-top: 10px; color: #6B7280;">جاري إنشاء موقعك... هذه العملية قد تستغرق بضع ثوانٍ</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/builder.js"></script>
+</body>
+</html>
