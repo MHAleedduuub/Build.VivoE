@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🤖 إنشاء موقع بالذكاء الاصطناعي - منشئ المواقع</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .ai-hero {
+            background: linear-gradient(135deg, #8B5CF6 0%, #3B82F6 100%);
+            color: white;
+            padding: 60px 20px;
+            text-align: center;
+            border-radius: 0 0 40px 40px;
+            margin-bottom: 40px;
+        }
+        .ai-hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+        .ai-hero p {
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+            opacity: 0.9;
+        }
+        .ai-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        .ai-form {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            margin-bottom: 40px;
+        }
+        .form-group {
+            margin-bottom: 25px;
+        }
+        .form-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #1F2937;
+            font-size: 1.1rem;
+        }
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #E5E7EB;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            outline: none;
+            border-color: #8B5CF6;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+        }
+        .form-textarea {
+            height: 150px;
+            resize: vertical;
+        }
+        .form-hint {
+            display: block;
+            margin-top: 8px;
+            color: #6B7280;
+            font-size: 0.9rem;
+        }
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+        .option-card {
+            background: #F9FAFB;
+            border: 2px solid #E5E7EB;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .option-card:hover {
+            background: #F3F4F6;
+            border-color: #D1D5DB;
+        }
+        .option-card.selected {
+            background: #EDE9FE;
+            border-color: #8B5CF6;
+            color: #7C3AED;
+        }
+        .option-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        .ai-examples {
+            background: #F8FAFC;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+        }
+        .example-item {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        .example-item:hover {
+            border-color: #8B5CF6;
+            transform: translateX(-5px);
+        }
+        .ai-preview {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            margin: 40px 0;
+            display: none;
+        }
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .code-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #E5E7EB;
+            padding-bottom: 10px;
+        }
+        .tab-btn {
+            padding: 10px 20px;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-weight: 500;
+            color: #6B7280;
+        }
+        .tab-btn.active {
+            color: #8B5CF6;
+            border-bottom-color: #8B5CF6;
+        }
+        .code-block {
+            background: #1F2937;
+            color: #E5E7EB;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            display: none;
+        }
+        .code-block.active {
+            display: block;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+        .loading-spinner {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            border: 4px solid #F3F4F6;
+            border-top: 4px solid #8B5CF6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .ai-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+            text-align: center;
+        }
+        .stat-item {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #8B5CF6;
+            margin-bottom: 5px;
+        }
+        .stat-label {
+            color: #6B7280;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- شريط التنقل -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">
+                <i class="fas fa-globe"></i>
+                <span>منشئ المواقع</span>
+            </a>
+            
+            <div class="nav-links">
+                <a href="/" class="nav-link"><i class="fas fa-home"></i> الرئيسية</a>
+                <a href="/dashboard" class="nav-link"><i class="fas fa-tachometer-alt"></i> لوحة التحكم</a>
+                <a href="/builder" class="nav-link"><i class="fas fa-paint-brush"></i> منشئ المواقع</a>
+                <a href="/ai/create" class="nav-link active"><i class="fas fa-robot"></i> الذكاء الاصطناعي</a>
+                <a href="/templates" class="nav-link"><i class="fas fa-th-large"></i> القوالب</a>
+            </div>
+            
+            <div class="user-menu">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <img src="https://ui-avatars.com/api/?name=مستخدم&background=8B5CF6&color=fff&size=40" 
+                         alt="المستخدم" class="avatar">
+                    <a href="/logout" class="btn btn-outline" style="padding: 8px 15px;">
+                        <i class="fas fa-sign-out-alt"></i> خروج
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- قسم البطل -->
+    <section class="ai-hero">
+        <h1><i class="fas fa-robot"></i> أنشئ موقعك بالذكاء الاصطناعي</h1>
+        <p>لا تحتاج إلى خبرة في البرمجة، فقط صف ما تريد وسننشئه لك تلقائياً</p>
+    </section>
+
+    <!-- المحتوى الرئيسي -->
+    <main class="ai-container">
+        <!-- إحصائيات -->
+        <div class="ai-stats">
+            <div class="stat-item">
+                <div class="stat-value">1,234+</div>
+                <div class="stat-label">مواقع منشأة</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">98%</div>
+                <div class="stat-label">رضا العملاء</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">5 دقائق</div>
+                <div class="stat-label">متوسط وقت الإنشاء</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">⭐ 4.8</div>
+                <div class="stat-label">تقييم الجودة</div>
+            </div>
+        </div>
+
+        <!-- نموذج الإنشاء -->
+        <div class="ai-form">
+            <h2 style="margin-bottom: 30px; color: #1F2937;">🎯 صف موقعك المثالي</h2>
+            
+            <div class="form-group">
+                <label class="form-label">ما نوع موقعك؟</label>
+                <input type="text" class="form-input" id="site-name" 
+                       placeholder="مثال: موقع لبيع العطور الفاخرة">
+                <span class="form-hint">اكتب وصفاً مختصراً لنوع موقعك</span>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">صف موقعك بالتفصيل</label>
+                <textarea class="form-textarea" id="site-description" 
+                          placeholder="أريد موقعاً يحتوي على:
+• صفحة رئيسية مع عروض مميزة
+• معرض صور للمنتجات
+• نظام تقييمات العملاء
+• نموذج اتصال
+• صفحة عن الشركة"></textarea>
+                <span class="form-hint">كلما كان الوصف تفصيلياً، كانت النتيجة أفضل</span>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">اختر نمط التصميم</label>
+                <div class="options-grid">
+                    <div class="option-card" data-style="modern">
+                        <div class="option-icon">🔄</div>
+                        <div>حديث</div>
+                    </div>
+                    <div class="option-card" data-style="minimal">
+                        <div class="option-icon">🎨</div>
+                        <div>بسيط</div>
+                    </div>
+                    <div class="option-card" data-style="elegant">
+                        <div class="option-icon">✨</div>
+                        <div>أنيق</div>
+                    </div>
+                    <div class="option-card" data-style="corporate">
+                        <div class="option-icon">🏢</div>
+                        <div>احترافي</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">الألوان المفضلة</label>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <input type="color" id="color1" value="#8B5CF6" style="width: 50px; height: 50px; border: none; border-radius: 8px; cursor: pointer;">
+                    <input type="color" id="color2" value="#3B82F6" style="width: 50px; height: 50px; border: none; border-radius: 8px; cursor: pointer;">
+                    <input type="color" id="color3" value="#10B981" style="width: 50px; height: 50px; border: none; border-radius: 8px; cursor: pointer;">
+                    <input type="color" id="color4" value="#F59E0B" style="width: 50px; height: 50px; border: none; border-radius: 8px; cursor: pointer;">
+                </div>
+            </div>
+
+            <button class="btn btn-primary" id="generate-btn" 
+                    style="width: 100%; padding: 18px; font-size: 1.2rem; margin-top: 20px;">
+                <i class="fas fa-magic"></i> أنشئ موقعي بالذكاء الاصطناعي
+            </button>
+        </div>
+
+        <!-- أمثلة -->
+        <div class="ai-examples">
+            <h3 style="margin-bottom: 20px; color: #1F2937;">💡 أمثلة جاهزة:</h3>
+            <div class="example-item" data-example="1">
+                <h4 style="margin-bottom: 10px;">🏪 موقع متجر إلكتروني</h4>
+                <p style="color: #6B7280; margin-bottom: 0;">موقع لبيع المنتجات مع معرض صور، نظام تقييمات، عربة تسوق، ودفع إلكتروني.</p>
+            </div>
+            <div class="example-item" data-example="2">
+                <h4 style="margin-bottom: 10px;">📝 موقع شخصي / معرض أعمال</h4>
+                <p style="color: #6B7280; margin-bottom: 0;">موقع لعرض المهارات والخبرات مع سيرة ذاتية، معرض أعمال، وشهادات.</p>
+            </div>
+            <div class="example-item" data-example="3">
+                <h4 style="margin-bottom: 10px;">🍽️ موقع مطعم</h4>
+                <p style="color: #6B7280; margin-bottom: 0;">موقع مطعم مع قائمة الطعام، نظام حجوزات، موقع التواصل، وخرائط الوصول.</p>
+            </div>
+        </div>
+
+        <!-- تحميل -->
+        <div class="loading" id="loading-section" style="display: none;">
+            <div class="loading-spinner"></div>
+            <h3 style="margin-bottom: 10px; color: #1F2937;">جاري إنشاء موقعك بالذكاء الاصطناعي</h3>
+            <p style="color: #6B7280;">Gemini AI يعمل على إنشاء موقع متكامل بناءً على وصفك...</p>
+            <div style="margin-top: 30px;">
+                <div style="background: #E5E7EB; height: 8px; border-radius: 4px; overflow: hidden;">
+                    <div id="progress-bar" style="background: #8B5CF6; height: 100%; width: 0%; transition: width 0.3s;"></div>
+                </div>
+                <p id="progress-text" style="margin-top: 10px; color: #6B7280;">جاري تحليل الوصف...</p>
+            </div>
+        </div>
+
+        <!-- المعاينة -->
+        <div class="ai-preview" id="preview-section">
+            <div class="preview-header">
+                <h3 style="color: #1F2937;">✅ تم إنشاء موقعك بنجاح!</h3>
+                <div>
+                    <button class="btn btn-outline" onclick="editInBuilder()">
+                        <i class="fas fa-paint-brush"></i> تعديل في المنشئ
+                    </button>
+                    <button class="btn btn-primary" onclick="publishSite()" style="margin-right: 10px;">
+                        <i class="fas fa-rocket"></i> نشر الموقع
+                    </button>
+                </div>
+            </div>
+
+            <div class="code-tabs">
+                <button class="tab-btn active" onclick="showCodeTab('html')">HTML</button>
+                <button class="tab-btn" onclick="showCodeTab('css')">CSS</button>
+                <button class="tab-btn" onclick="showCodeTab('js')">JavaScript</button>
+                <button class="tab-btn" onclick="showCodeTab('preview')">المعاينة</button>
+            </div>
+
+            <div id="html-tab" class="code-block active">
+                <!-- سيتم ملؤها بالكود -->
+            </div>
+            <div id="css-tab" class="code-block">
+                <!-- سيتم ملؤها بالكود -->
+            </div>
+            <div id="js-tab" class="code-block">
+                <!-- سيتم ملؤها بالكود -->
+            </div>
+            <div id="preview-tab" class="code-block" style="background: white; color: #333;">
+                <!-- معاينة الموقع -->
+                <iframe id="site-preview" style="width: 100%; height: 500px; border: none; border-radius: 8px;"></iframe>
+            </div>
+        </div>
+    </main>
+
+    <!-- التذييل -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3><i class="fas fa-robot"></i> الذكاء الاصطناعي</h3>
+                <p>أنشئ مواقع ويب كاملة باستخدام Gemini AI</p>
+            </div>
+            <div class="footer-section">
+                <h3>المميزات</h3>
+                <ul style="list-style: none; padding: 0;">
+                    <li><a href="#" style="color: #d1d5db; text-decoration: none;">إنشاء تلقائي</a></li>
+                    <li><a href="#" style="color: #d1d5db; text-decoration: none;">تحسين SEO</a></li>
+                    <li><a href="#" style="color: #d1d5db; text-decoration: none;">تصميم متجاوب</a></li>
+                    <li><a href="#" style="color: #d1d5db; text-decoration: none;">نشر فوري</a></li>
+                </ul>
+            </div>
+        </div>
+        <div style="text-align: center; padding-top: 20px; border-top: 1px solid #374151; margin-top: 30px;">
+            <p>© 2024 منشئ المواقع بالذكاء الاصطناعي</p>
+        </div>
+    </footer>
+
+    <script src="/js/ai.js"></script>
+</body>
+</html>
